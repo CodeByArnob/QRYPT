@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070B14" />
+      <stop offset="52%" stop-color="#0D1424" />
+      <stop offset="100%" stop-color="#121D30" />
+    </linearGradient>
+    <linearGradient id="cyanBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00E5FF" />
+      <stop offset="100%" stop-color="#3B82F6" />
+    </linearGradient>
+    <linearGradient id="laserGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.2" />
+      <stop offset="20%" stop-color="#00E5FF" />
+      <stop offset="50%" stop-color="#F5FAFF" />
+      <stop offset="80%" stop-color="#00E5FF" />
+      <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="54" fill="url(#bgGrad)" stroke="url(#cyanBlue)" stroke-width="4" />
+  <rect x="28" y="28" width="200" height="200" rx="38" fill="#0D1424" fill-opacity="0.7" stroke="#00E5FF" stroke-opacity="0.35" stroke-width="2" />
+  <!-- Outer Reticle Brackets -->
+  <path d="M46 78 V54 A8 8 0 0 1 54 46 H78" fill="none" stroke="#00E5FF" stroke-width="7" stroke-linecap="round" />
+  <path d="M178 46 H202 A8 8 0 0 1 210 54 V78" fill="none" stroke="#00E5FF" stroke-width="7" stroke-linecap="round" />
+  <path d="M46 178 V202 A8 8 0 0 0 54 210 H78" fill="none" stroke="#3B82F6" stroke-width="7" stroke-linecap="round" />
+  <path d="M178 210 H202 A8 8 0 0 0 210 202 V178" fill="none" stroke="#3B82F6" stroke-width="7" stroke-linecap="round" />
+  <!-- 3 QR Finder Squares -->
+  <rect x="66" y="66" width="46" height="46" rx="8" fill="none" stroke="#F5FAFF" stroke-width="7" />
+  <rect x="81" y="81" width="16" height="16" rx="3" fill="#00E5FF" />
+  <rect x="144" y="66" width="46" height="46" rx="8" fill="none" stroke="#F5FAFF" stroke-width="7" />
+  <rect x="159" y="81" width="16" height="16" rx="3" fill="#00E5FF" />
+  <rect x="66" y="144" width="46" height="46" rx="8" fill="none" stroke="#F5FAFF" stroke-width="7" />
+  <rect x="81" y="159" width="16" height="16" rx="3" fill="#00E5FF" />
+  <!-- 4th Quadrant 1D Barcode Bars -->
+  <rect x="144" y="144" width="10" height="46" rx="2" fill="url(#cyanBlue)" />
+  <rect x="160" y="144" width="6" height="46" rx="2" fill="url(#cyanBlue)" />
+  <rect x="172" y="144" width="10" height="46" rx="2" fill="url(#cyanBlue)" />
+  <rect x="186" y="144" width="5" height="46" rx="2" fill="url(#cyanBlue)" />
+  <!-- Laser Scan Beam -->
+  <rect x="38" y="124" width="180" height="8" rx="4" fill="url(#laserGrad)" />
+</svg>

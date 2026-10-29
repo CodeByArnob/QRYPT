@@ -1,0 +1,6 @@
+{
+  "name": "QRYPT",
+  "description": "Scan Smarter. Instantly. Next-generation offline QR & Barcode scanner and Liquid Glass studio by Arnobrazz.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

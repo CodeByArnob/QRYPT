@@ -1,0 +1,94 @@
+name: Android CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build, Lint, Test & Verify APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK Licenses & Install API 36
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.0.0'
+
+      - name: Restore Debug Keystore
+        run: |
+          if [ ! -f debug.keystore ] && [ -f debug.keystore.base64 ]; then
+            base64 -d debug.keystore.base64 > debug.keystore
+          fi
+
+      - name: Run Unit & Robolectric Tests
+        run: gradle :app:testDebugUnitTest --stacktrace
+
+      - name: Run Android Lint
+        run: gradle :app:lintDebug --stacktrace
+
+      - name: Assemble Debug APK
+        run: gradle :app:assembleDebug --stacktrace
+
+      - name: Verify Generated APK Artifact
+        run: |
+          APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
+          if [ ! -s "$APK_PATH" ]; then
+            echo "Error: APK was not generated or is empty at $APK_PATH"
+            exit 1
+          fi
+          cp "$APK_PATH" QRYPT-debug.apk
+          sha256sum QRYPT-debug.apk > QRYPT-debug.apk.sha256
+          ls -lh QRYPT-debug.apk QRYPT-debug.apk.sha256
+
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: QRYPT-debug-apk
+          path: |
+            QRYPT-debug.apk
+            QRYPT-debug.apk.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload Unit Test, Lint & Screenshot Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: QRYPT-test-and-lint-reports
+          path: |
+            app/build/reports/tests/testDebugUnitTest/
+            app/build/reports/lint-results-debug.*
+            docs/screenshots/*.png
+          if-no-files-found: warn
+          retention-days: 14

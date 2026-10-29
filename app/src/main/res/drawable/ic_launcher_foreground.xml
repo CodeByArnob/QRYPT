@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Safe-zone centered (22..86 inside 108dp canvas) -->
+    <!-- Elevated Deep Navy Squircle Base Plate -->
+    <path
+        android:pathData="M36,22 H72 C79.73,22 86,28.27 86,36 V72 C86,79.73 79.73,86 72,86 H36 C28.27,86 22,79.73 22,72 V36 C22,28.27 28.27,22 36,22 Z"
+        android:strokeWidth="1.2">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="22"
+                android:startY="22"
+                android:endX="86"
+                android:endY="86"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#D90D1424" />
+                <item android:offset="0.55" android:color="#EB070B14" />
+                <item android:offset="1.0" android:color="#D9121D30" />
+            </gradient>
+        </aapt:attr>
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="22"
+                android:startY="22"
+                android:endX="86"
+                android:endY="86"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#B300E5FF" />
+                <item android:offset="0.5" android:color="#663B82F6" />
+                <item android:offset="1.0" android:color="#993B82F6" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Top Specular Glass Sheen Highlight -->
+    <path
+        android:pathData="M36,23.5 H72 C78.9,23.5 84.5,29.1 84.5,36 V44 C70,49 38,49 23.5,44 V36 C23.5,29.1 29.1,23.5 36,23.5 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="54"
+                android:startY="23"
+                android:endX="54"
+                android:endY="48"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#2EFFFFFF" />
+                <item android:offset="1.0" android:color="#00FFFFFF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Outer Scanning Corner Brackets (Vivid Cyan #00E5FF to Electric Blue #3B82F6) -->
+    <path
+        android:pathData="M27,39 V32 C27,29.24 29.24,27 32,27 H39 V30.5 H32 C31.17,30.5 30.5,31.17 30.5,32 V39 Z M69,27 H76 C78.76,27 81,29.24 81,32 V39 H77.5 V32 C77.5,31.17 76.83,30.5 76,30.5 H69 Z M27,69 H30.5 V76 C30.5,76.83 31.17,77.5 32,77.5 H39 V81 H32 C29.24,81 27,78.76 27,76 Z M77.5,69 H81 V76 C81,78.76 78.76,81 76,81 H69 V77.5 H76 C76.83,77.5 77.5,76.83 77.5,76 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="27"
+                android:startY="27"
+                android:endX="81"
+                android:endY="81"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#F5FAFF" />
+                <item android:offset="0.45" android:color="#00E5FF" />
+                <item android:offset="1.0" android:color="#3B82F6" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Three Precision QR Finder Squares (Top-Left, Top-Right, Bottom-Left) -->
+    <path
+        android:pathData="M36,34 H49 C50.1,34 51,34.9 51,36 V49 C51,50.1 50.1,51 49,51 H36 C34.9,51 34,50.1 34,49 V36 C34,34.9 34.9,34 36,34 Z M38,38 V47 H47 V38 H38 Z M59,34 H72 C73.1,34 74,34.9 74,36 V49 C74,50.1 73.1,51 72,51 H59 C57.9,51 57,50.1 57,49 V36 C57,34.9 57.9,34 59,34 Z M61,38 V47 H70 V38 H61 Z M36,57 H49 C50.1,57 51,57.9 51,59 V72 C51,73.1 50.1,74 49,74 H36 C34.9,74 34,73.1 34,72 V59 C34,57.9 34.9,57 36,57 Z M38,61 V70 H47 V61 H38 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="34"
+                android:startY="34"
+                android:endX="74"
+                android:endY="74"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#F5FAFF" />
+                <item android:offset="0.65" android:color="#E0F2FE" />
+                <item android:offset="1.0" android:color="#93C5FD" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Inner Glowing Cores of the QR Finder Squares -->
+    <path
+        android:pathData="M40.2,40.2 H44.8 V44.8 H40.2 Z M63.2,40.2 H67.8 V44.8 H63.2 Z M40.2,63.2 H44.8 V67.8 H40.2 Z"
+        android:fillColor="#00E5FF" />
+
+    <!-- Fourth Quadrant Precision Barcode Bars (Vivid Cyan to Electric Blue) -->
+    <path
+        android:pathData="M57,57 H60.5 V74 H57 Z M62.8,57 H65.2 V74 H62.8 Z M67.4,57 H70.8 V74 H67.4 Z M72.4,57 H74.2 V74 H72.4 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="57"
+                android:startY="57"
+                android:endX="74"
+                android:endY="74"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#00E5FF" />
+                <item android:offset="1.0" android:color="#3B82F6" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Horizontal Optical Scan Beam (#3B82F6 -> #00E5FF -> #F5FAFF -> #00E5FF -> #3B82F6) -->
+    <path
+        android:pathData="M24,52.3 H84 V55.7 H24 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="24"
+                android:startY="54"
+                android:endX="84"
+                android:endY="54"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#3B82F6" />
+                <item android:offset="0.2" android:color="#00E5FF" />
+                <item android:offset="0.5" android:color="#F5FAFF" />
+                <item android:offset="0.8" android:color="#00E5FF" />
+                <item android:offset="1.0" android:color="#3B82F6" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

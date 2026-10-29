@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">QRYPT</string>
+    <string name="app_short_name">QRYPT</string>
+    <string name="app_tagline">Scan Smarter. Instantly.</string>
+    <string name="developer_name">Arnobrazz</string>
+
+    <!-- Navigation -->
+    <string name="nav_scan">Scanner</string>
+    <string name="nav_batch">Batch</string>
+    <string name="nav_create">Studio</string>
+    <string name="nav_history">Vault</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Scanner Controls -->
+    <string name="action_toggle_torch">Toggle Torch</string>
+    <string name="action_switch_camera">Switch Camera</string>
+    <string name="action_scan_gallery">Scan Image from Gallery</string>
+    <string name="action_continuous_mode">Continuous Scan Mode</string>
+    <string name="action_batch_mode">Batch Scan Mode</string>
+    <string name="action_low_light_boost">Low-Light Boost</string>
+    <string name="action_test_sample">Instant Optical Self-Test</string>
+    <string name="scan_region_full">Full Frame</string>
+    <string name="scan_region_square">Precision Square</string>
+    <string name="scan_region_wide">1D Barcode Slit</string>
+
+    <!-- Permissions & Camera States -->
+    <string name="camera_permission_title">Optical Sensor Access</string>
+    <string name="camera_permission_rationale">QRYPT processes all QR codes and barcodes 100% on-device using hardware-accelerated optical analysis. No frames ever leave your device.</string>
+    <string name="action_grant_camera">Enable Camera</string>
+    <string name="action_use_gallery_instead">Scan from Photo Library</string>
+
+    <!-- Result Actions -->
+    <string name="action_copy">Copy</string>
+    <string name="action_share">Share</string>
+    <string name="action_open_url">Open Safely</string>
+    <string name="action_favorite">Favorite</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_export_csv">Export CSV</string>
+    <string name="action_export_json">Export JSON</string>
+    <string name="security_warning_title">Suspicious Link Detected</string>
+    <string name="security_warning_desc">This URL exhibits potential phishing, unencrypted HTTP, IP-literal host, or homograph characteristics. Verify before opening.</string>
+
+    <!-- History & Settings -->
+    <string name="history_search_hint">Search payload, format, label, or notes…</string>
+    <string name="history_empty_title">Your QRYPT Vault is Empty</string>
+    <string name="history_empty_subtitle">Scanned and generated codes appear here with full offline search, security inspection, and bulk CSV/JSON export.</string>
+    <string name="settings_clear_history">Clear All Scan History</string>
+    <string name="settings_clear_confirm_title">Purge Local Vault?</string>
+    <string name="settings_clear_confirm_desc">This permanently removes stored scan records from local SQLite storage. Favorites can optionally be preserved.</string>
+</resources>

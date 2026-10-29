@@ -1,0 +1,154 @@
+name: Android Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Version tag to publish (e.g., v1.0.0)'
+        required: false
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  release-apk:
+    name: Build, Sign & Publish GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Determine Release Tag
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.release_tag }}"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          VERSION="${TAG#v}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK Platform 36 & Build Tools
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.0.0'
+
+      - name: Restore Debug Keystore
+        run: |
+          if [ ! -f debug.keystore ] && [ -f debug.keystore.base64 ]; then
+            base64 -d debug.keystore.base64 > debug.keystore
+          fi
+
+      - name: Run Unit & Robolectric Verification Suite
+        run: gradle :app:testDebugUnitTest --stacktrace
+
+      - name: Prepare Release Signing Keystore
+        id: signing
+        env:
+          SECRET_KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
+          SECRET_STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          SECRET_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -n "$SECRET_KEYSTORE_B64" ] && [ -n "$SECRET_STORE_PASSWORD" ] && [ -n "$SECRET_KEY_PASSWORD" ]; then
+            echo "$SECRET_KEYSTORE_B64" | base64 -d > "${GITHUB_WORKSPACE}/my-upload-key.jks"
+            echo "STORE_PASSWORD=$SECRET_STORE_PASSWORD" >> "$GITHUB_ENV"
+            echo "KEY_PASSWORD=$SECRET_KEY_PASSWORD" >> "$GITHUB_ENV"
+            echo "KEYSTORE_PATH=${GITHUB_WORKSPACE}/my-upload-key.jks" >> "$GITHUB_ENV"
+            echo "signing_mode=Configured GitHub Repository Signing Certificate (v2/v3 Scheme)" >> "$GITHUB_OUTPUT"
+          else
+            EPHEMERAL_PASS="QryptReleaseKey2026"
+            keytool -genkeypair -v \
+              -keystore "${GITHUB_WORKSPACE}/my-upload-key.jks" \
+              -alias upload \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -storepass "$EPHEMERAL_PASS" \
+              -keypass "$EPHEMERAL_PASS" \
+              -dname "CN=Arnobrazz, OU=QRYPT Optical Systems, O=CodeByArnob, L=Dhaka, S=Dhaka, C=BD"
+            echo "STORE_PASSWORD=$EPHEMERAL_PASS" >> "$GITHUB_ENV"
+            echo "KEY_PASSWORD=$EPHEMERAL_PASS" >> "$GITHUB_ENV"
+            echo "KEYSTORE_PATH=${GITHUB_WORKSPACE}/my-upload-key.jks" >> "$GITHUB_ENV"
+            echo "signing_mode=Self-Signed CI Release Certificate (configure KEYSTORE_BASE64, STORE_PASSWORD, KEY_PASSWORD secrets for persistent key)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build Release & Debug APKs
+        run: gradle :app:assembleRelease :app:assembleDebug --no-configuration-cache --stacktrace
+
+      - name: Package & Verify Release Artifacts
+        run: |
+          VERSION="${{ steps.meta.outputs.version }}"
+          RELEASE_APK="QRYPT-v${VERSION}-release.apk"
+          DEBUG_APK="QRYPT-v${VERSION}-debug.apk"
+
+          cp app/build/outputs/apk/release/app-release.apk "$RELEASE_APK"
+          cp app/build/outputs/apk/debug/app-debug.apk "$DEBUG_APK"
+
+          /opt/android/sdk/build-tools/36.0.0/apksigner verify --verbose "$RELEASE_APK" || apksigner verify --verbose "$RELEASE_APK" || true
+          sha256sum "$RELEASE_APK" "$DEBUG_APK" > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Generate Release Notes
+        run: |
+          VERSION="${{ steps.meta.outputs.version }}"
+          TAG="${{ steps.meta.outputs.tag }}"
+          cat <<EOF > RELEASE_NOTES.md
+          ## QRYPT ${TAG} — Scan Smarter. Instantly.
+
+          Production Android release of **QRYPT QR & Barcode Scanner** (\`com.arnobrazz.qrypt\`) by **Arnobrazz**.
+
+          ### Highlights & Capabilities
+          - **Dual-Engine Optical Scanner**: Real-time CameraX + Google ML Kit Barcode Scanning & ZXing Multi-Format Reader supporting all **13 major 1D & 2D symbologies** (\`QR Code\`, \`Aztec\`, \`Data Matrix\`, \`PDF417\`, \`EAN-13\`, \`EAN-8\`, \`UPC-A\`, \`UPC-E\`, \`Code 128\`, \`Code 39\`, \`Code 93\`, \`Codabar\`, \`ITF\`).
+          - **Offline Anti-Phishing URL Heuristics**: Local verification of HTTPS encryption, Punycode (\`xn--\`) homograph spoofing, raw IP hosts, embedded \`@\` credentials, and URL shorteners.
+          - **Zero-Permission Photo Library Scanning**: Scan static images directly via the Android Photo Picker (\`PickVisualMedia\`).
+          - **Batch & Continuous Mode**: High-speed multi-barcode capture with session tagging and RFC-4180 **CSV** & **JSON** export.
+          - **Optical Generator Studio**: Create custom QR & 1D/2D barcodes across 10 structured payload templates with high-resolution PNG export.
+          - **100% Offline Privacy**: Zero \`INTERNET\` permission, zero analytics, zero cloud tracking. All records remain strictly in local SQLite (\`prism_scan_vault.db\`).
+
+          ### APK Signing & Verification
+          - **Signing Status**: ${{ steps.signing.outputs.signing_mode }}
+          - **SHA-256 Checksums**:
+          \`\`\`text
+          $(cat SHA256SUMS.txt)
+          \`\`\`
+
+          ### Installation Instructions
+          1. Download \`QRYPT-v${VERSION}-release.apk\` from the **Assets** section below.
+          2. Open the downloaded APK on your Android device (Android 7.0 / API 24 or newer).
+          3. If Google Play Protect displays *"Play Protect hasn't seen an app from this developer before"*, tap **More details → Install anyway** (standard Android notice for direct GitHub APK sideloads not distributed through Google Play).
+          EOF
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: "QRYPT ${{ steps.meta.outputs.tag }}"
+          body_path: RELEASE_NOTES.md
+          draft: false
+          prerelease: false
+          files: |
+            QRYPT-v${{ steps.meta.outputs.version }}-release.apk
+            QRYPT-v${{ steps.meta.outputs.version }}-debug.apk
+            SHA256SUMS.txt
