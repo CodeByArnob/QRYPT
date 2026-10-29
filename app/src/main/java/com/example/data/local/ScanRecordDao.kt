@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ScanRecordDao {
 
-    @Query("SELECT * FROM scan_records ORDER BY timestamp DESC")
+    @Query("SELECT * FROM scan_records ORDER BY timestamp DESC, id DESC")
     fun observeAllRecords(): Flow<List<ScanRecordEntity>>
 
-    @Query("SELECT * FROM scan_records ORDER BY timestamp DESC")
+    @Query("SELECT * FROM scan_records ORDER BY timestamp DESC, id DESC")
     suspend fun getAllRecordsSnapshot(): List<ScanRecordEntity>
 
-    @Query("SELECT * FROM scan_records WHERE rawValue = :rawValue ORDER BY timestamp DESC LIMIT 1")
+    @Query("SELECT * FROM scan_records WHERE rawValue = :rawValue ORDER BY timestamp DESC, id DESC LIMIT 1")
     suspend fun findLatestByRawValue(rawValue: String): ScanRecordEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

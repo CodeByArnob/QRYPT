@@ -224,6 +224,23 @@ class ExampleRobolectricTest {
         )
 
         val activeBatchId = viewModel.activeBatchSessionId.value
+        scanRepo.recordScan(
+            rawValue = "https://bit.ly/qrypt-v1-release",
+            format = BarcodeFormatType.QR_CODE,
+            isGenerated = false,
+            customNotes = "Shortened Release Link",
+            duplicatePreventionEnabled = false
+        )
+
+        scanRepo.recordScan(
+            rawValue = "8001234567893",
+            format = BarcodeFormatType.EAN_13,
+            isGenerated = false,
+            batchSessionId = activeBatchId,
+            customNotes = "Warehouse Batch #A4",
+            duplicatePreventionEnabled = false
+        )
+
         val wifiRecord = scanRepo.recordScan(
             rawValue = "WIFI:T:WPA;S:QRYPT-Optics-5G;P:Qrypt#2026!Secure;H:false;;",
             format = BarcodeFormatType.QR_CODE,
@@ -243,23 +260,6 @@ class ExampleRobolectricTest {
             duplicatePreventionEnabled = false
         )!!
         scanRepo.toggleFavorite(urlRecord.id, true)
-
-        scanRepo.recordScan(
-            rawValue = "8001234567893",
-            format = BarcodeFormatType.EAN_13,
-            isGenerated = false,
-            batchSessionId = activeBatchId,
-            customNotes = "Warehouse Batch #A4",
-            duplicatePreventionEnabled = false
-        )
-
-        scanRepo.recordScan(
-            rawValue = "http://secure-login@xn--pple-43d.top/verify-session",
-            format = BarcodeFormatType.QR_CODE,
-            isGenerated = false,
-            customNotes = "Quarantined Phishing Sample",
-            duplicatePreventionEnabled = false
-        )
 
         var capturedView: View? = null
         composeTestRule.setContent {

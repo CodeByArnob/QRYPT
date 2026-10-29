@@ -267,33 +267,35 @@ fun SecurityRiskBadge(
     riskLevel: SecurityRiskLevel,
     modifier: Modifier = Modifier
 ) {
+    val glass = LocalLiquidGlass.current
     val (color, icon) = when (riskLevel) {
         SecurityRiskLevel.SAFE -> SafeEmerald to Icons.Default.CheckCircle
         SecurityRiskLevel.CAUTION -> CautionAmber to Icons.Default.WarningAmber
-        SecurityRiskLevel.SUSPICIOUS -> DangerCrimson to Icons.Default.WarningAmber
+        SecurityRiskLevel.SUSPICIOUS -> CautionAmber.copy(alpha = 0.9f) to Icons.Default.WarningAmber
     }
 
     Surface(
         modifier = modifier,
-        shape = CircleShape,
-        color = color.copy(alpha = 0.18f),
-        border = BorderStroke(1.dp, color.copy(alpha = 0.55f))
+        shape = RoundedCornerShape(8.dp),
+        color = color.copy(alpha = if (glass.isDark) 0.10f else 0.08f),
+        border = BorderStroke(1.dp, color.copy(alpha = 0.28f))
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 11.dp, vertical = 5.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = riskLevel.label,
                 tint = color,
-                modifier = Modifier.size(15.dp)
+                modifier = Modifier.size(13.dp)
             )
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.width(5.dp))
             Text(
                 text = riskLevel.label,
-                style = MaterialTheme.typography.labelMedium,
-                color = color
+                style = MaterialTheme.typography.labelSmall,
+                color = color,
+                maxLines = 1
             )
         }
     }

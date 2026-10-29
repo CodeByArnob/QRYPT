@@ -174,7 +174,7 @@ fun BatchScannerScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "BATCH SESSION #$batchSessionId",
                             style = MaterialTheme.typography.labelSmall,
@@ -183,7 +183,7 @@ fun BatchScannerScreen(
                         )
                         Text(
                             text = "${batchRecords.size} Codes Captured",
-                            style = MaterialTheme.typography.headlineMedium,
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
@@ -197,14 +197,12 @@ fun BatchScannerScreen(
                         )
                     }
 
-                    OutlinedButton(
+                    LiquidGlassPill(
+                        text = "New Session",
+                        icon = Icons.Default.Refresh,
                         onClick = onStartNewSession,
                         modifier = Modifier.testTag("batch_new_session_button")
-                    ) {
-                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("New Session")
-                    }
+                    )
                 }
 
                 // Rapid Batch Input Controls
@@ -386,7 +384,7 @@ fun BatchScannerScreen(
                                 Icon(
                                     imageVector = Icons.Default.DeleteSweep,
                                     contentDescription = "Remove Item",
-                                    tint = DangerCrimson
+                                    tint = glass.textSecondary
                                 )
                             }
                         }

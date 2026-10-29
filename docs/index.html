@@ -810,9 +810,12 @@
       background: #050810;
       border: 1px solid var(--border-card);
       border-radius: var(--radius-md);
-      padding: 16px 18px;
+      padding: 14px 16px;
       overflow-x: auto;
-      font-size: 0.84rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+      font-size: 0.82rem;
+      line-height: 1.55;
       color: #D6E4FF;
       margin-top: 12px;
     }
@@ -1599,12 +1602,12 @@
 
           <div class="step-card">
             <span class="step-num">2</span>
-            <h3>Verify SHA-256 Checksum</h3>
+            <h3>Verify SHA-256 File Checksum (Optional)</h3>
             <p>
-              Every GitHub release includes <code>SHA256SUMS.txt</code> so you can verify package integrity before installing:
+              Every GitHub release includes a public <code>SHA256SUMS.txt</code> file fingerprint (not a private key) so users can verify the downloaded APK was not corrupted:
             </p>
             <pre class="code-box"><code>sha256sum QRYPT-v1.0.0-release.apk
-# Expected SHA-256:
+# Public APK File Checksum (SHA-256):
 # 071bc524d78637517b6ce14f6c471b2421497f79a5cfacfaaf2041bc048b9c23</code></pre>
           </div>
 

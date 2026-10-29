@@ -129,16 +129,18 @@ fun HistoryVaultScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "LOCAL OPTICAL VAULT",
                             style = MaterialTheme.typography.labelSmall,
-                            color = glass.primaryAccent
+                            color = glass.primaryAccent,
+                            maxLines = 1
                         )
                         Text(
                             text = "${filteredRecords.size} of $allRecordsCount Records",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
                         )
                     }
 
@@ -159,19 +161,6 @@ fun HistoryVaultScreen(
                                     exportJsonLauncher.launch("qrypt_vault_export.json")
                                 },
                                 modifier = Modifier.testTag("vault_export_json_button")
-                            )
-                            LiquidGlassPill(
-                                text = "Share",
-                                icon = Icons.Default.Share,
-                                onClick = {
-                                    val json = ScanRepository.exportToJson(filteredRecords)
-                                    ActionIntentHelper.shareExportFile(
-                                        context = context,
-                                        content = json,
-                                        filename = "qrypt_vault_export.json",
-                                        mimeType = "application/json"
-                                    )
-                                }
                             )
                         }
                     }
@@ -292,8 +281,9 @@ private fun VaultRecordCard(
 ) {
     val glass = LocalLiquidGlass.current
     val timeFormatted = remember(record.timestamp) {
-        SimpleDateFormat("MMM d • HH:mm", Locale.US).format(Date(record.timestamp))
+        SimpleDateFormat("MMM d, HH:mm", Locale.US).format(Date(record.timestamp))
     }
+    val sourceLabel = if (record.isGenerated) "Studio" else "Scanned"
 
     LiquidGlassCard(
         onClick = onClick,
@@ -309,16 +299,16 @@ private fun VaultRecordCard(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(42.dp)
+                        .size(40.dp)
                         .clip(CircleShape)
-                        .background(glass.primaryAccent.copy(alpha = 0.16f)),
+                        .background(glass.primaryAccent.copy(alpha = 0.14f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = iconForPayloadType(record.payloadType),
                         contentDescription = record.payloadType.displayName,
                         tint = glass.primaryAccent,
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size(20.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
@@ -329,17 +319,14 @@ private fun VaultRecordCard(
                     ) {
                         FormatBadge(format = record.format)
                         Text(
-                            text = if (record.isGenerated) "Studio" else "Scanned",
+                            text = "$sourceLabel • $timeFormatted",
                             style = MaterialTheme.typography.labelSmall,
-                            color = glass.textSecondary
-                        )
-                        Text(
-                            text = "• $timeFormatted",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = glass.textSecondary
+                            color = glass.textSecondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(3.dp))
                     Text(
                         text = record.primaryTitle,
                         style = MaterialTheme.typography.titleMedium,
@@ -356,38 +343,53 @@ private fun VaultRecordCard(
                     )
                 }
 
-                IconButton(
-                    onClick = onToggleFavorite,
-                    modifier = Modifier.testTag("vault_fav_${record.id}")
+                Spacer(modifier = Modifier.width(6.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(0.dp)
                 ) {
-                    Icon(
-                        imageVector = if (record.isFavorite) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                        contentDescription = "Favorite",
-                        tint = if (record.isFavorite) glass.primaryAccent else glass.textSecondary
-                    )
-                }
-                IconButton(onClick = onCopy) {
-                    Icon(
-                        imageVector = Icons.Default.ContentCopy,
-                        contentDescription = "Copy",
-                        tint = glass.textSecondary,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-                IconButton(onClick = onDelete) {
-                    Icon(
-                        imageVector = Icons.Default.DeleteOutline,
-                        contentDescription = "Delete",
-                        tint = DangerCrimson,
-                        modifier = Modifier.size(20.dp)
-                    )
+                    IconButton(
+                        onClick = onToggleFavorite,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .testTag("vault_fav_${record.id}")
+                    ) {
+                        Icon(
+                            imageVector = if (record.isFavorite) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                            contentDescription = "Favorite",
+                            tint = if (record.isFavorite) glass.primaryAccent else glass.textSecondary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = onCopy,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ContentCopy,
+                            contentDescription = "Copy",
+                            tint = glass.textSecondary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = onDelete,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.DeleteOutline,
+                            contentDescription = "Delete",
+                            tint = glass.textSecondary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 }
             }
 
             if (record.securityRisk != SecurityRiskLevel.SAFE || record.customNotes.isNotBlank()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (record.securityRisk != SecurityRiskLevel.SAFE) {
@@ -396,10 +398,11 @@ private fun VaultRecordCard(
                     if (record.customNotes.isNotBlank()) {
                         Text(
                             text = "Note: ${record.customNotes}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = glass.primaryAccent,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = glass.textSecondary,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
                         )
                     }
                 }
