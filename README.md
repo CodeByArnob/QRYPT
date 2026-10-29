@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="docs/assets/qrypt-logo.svg" alt="QRYPT Logo" width="108" height="108" />
+<img src="docs/assets/qrypt-logo.svg" alt="QRYPT Animated Optical Logo" width="112" height="112" />
 
-# QRYPT — QR & Barcode Scanner
+# QRYPT QR & Barcode Scanner
 
 **Scan Smarter. Instantly.**
 
@@ -10,10 +10,18 @@
 [![Release APK](https://github.com/CodeByArnob/QRYPT/actions/workflows/release.yml/badge.svg)](https://github.com/CodeByArnob/QRYPT/releases)
 [![GitHub Pages](https://github.com/CodeByArnob/QRYPT/actions/workflows/pages.yml/badge.svg)](https://codebyarnob.github.io/QRYPT/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-00E5FF.svg)](LICENSE)
-[![Android API](https://img.shields.io/badge/Android-API%2024%E2%80%9336-3B82F6.svg)](https://developer.android.com)
+[![Android API](https://img.shields.io/badge/Android-API%2024%20to%2036-3B82F6.svg)](https://developer.android.com)
 [![Jetpack Compose](https://img.shields.io/badge/Jetpack_Compose-Material_3-00E5FF.svg)](https://developer.android.com/jetpack/compose)
 
-**QRYPT** is a high-precision, 100% offline Android QR and 13-format barcode scanner, batch inventory processor, anti-phishing URL inspector, local Room SQLite history vault, and 1024px–1536px optical QR studio engineered by **ArnobRazz** with **Kotlin**, **Jetpack Compose (Material 3)**, **CameraX**, **Google ML Kit**, and **ZXing**.
+<br />
+
+<a href="https://codebyarnob.github.io/QRYPT/">
+  <img src="docs/assets/qrypt-hero-motion.svg" alt="QRYPT Real-Time Optical Engine Motion Telemetry" width="100%" />
+</a>
+
+<br />
+
+**QRYPT** is a high-precision, 100% offline Android QR and 13-format barcode scanner, batch inventory processor, anti-phishing URL inspector, local Room SQLite history vault, and 1024px to 1536px optical QR studio engineered by **ArnobRazz** with **Kotlin**, **Jetpack Compose (Material 3)**, **CameraX**, **Google ML Kit**, and **ZXing**.
 
 [**Download for Android (v1.0.0 APK)**](https://github.com/CodeByArnob/QRYPT/releases/download/v1.0.0/QRYPT-v1.0.0-release.apk) • [**Live Product Page**](https://codebyarnob.github.io/QRYPT/) • [**Release Notes & SHA-256**](https://github.com/CodeByArnob/QRYPT/releases/tag/v1.0.0) • [**Privacy Policy**](PRIVACY_POLICY.md) • [**Security Policy**](SECURITY.md)
 
@@ -65,7 +73,7 @@ QRYPT combines low-latency optical decoding with a refined **Liquid Glass** inte
 - **GS1 & Modulo-10 Validation**: Computes Modulo-10 check digits and resolves GS1 country/region prefixes (including Bookland ISBN-13 / ISBN-10) for retail EAN/UPC barcodes.
 
 ### 4. High-Speed Batch & Continuous Inventory Mode
-- **Multi-Scan Session Queue**: Capture dozens of barcodes in rapid succession with configurable duplicate cooldown suppression (`1–15s`).
+- **Multi-Scan Session Queue**: Capture dozens of barcodes in rapid succession with configurable duplicate cooldown suppression (`1 to 15s`).
 - **Bulk Warehouse Tagging**: Attach batch notes/tags to an entire session and export RFC-4180 **CSV** or structured **JSON** files via Android’s `FileProvider` share sheet.
 
 ### 5. Local Optical Vault (Room SQLite)
@@ -205,7 +213,7 @@ When these secrets are not yet configured in the repository settings, the workfl
 
 - **Contributing Guide**: See [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 - **Changelog**: See [CHANGELOG.md](CHANGELOG.md).
-- **Security Policy**: See [SECURITY.md](SECURITY.md) — report vulnerabilities privately to `arnobrazz.dev@gmail.com`.
+- **Security Policy**: See [SECURITY.md](SECURITY.md) (report vulnerabilities privately to `arnobrazz.dev@gmail.com`).
 - **Issues & Feature Requests**: [https://github.com/CodeByArnob/QRYPT/issues](https://github.com/CodeByArnob/QRYPT/issues)
 - **Developer**: **ArnobRazz** ([@CodeByArnob](https://github.com/CodeByArnob))
-- **License**: Released under the [MIT License](LICENSE) — **© 2026 ArnobRazz**.
+- **License**: Released under the [MIT License](LICENSE) • **© 2026 ArnobRazz**.

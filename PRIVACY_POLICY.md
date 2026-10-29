@@ -1,4 +1,4 @@
-# Privacy Policy — QRYPT QR & Barcode Scanner
+# Privacy Policy: QRYPT QR & Barcode Scanner
 
 **Effective Date:** October 29, 2026  
 **Developer:** Arnobrazz (`arnobrazz.dev@gmail.com`)  
@@ -11,7 +11,7 @@
 **QRYPT** is built from the ground up as a privacy-first utility. The application does **not** request `android.permission.INTERNET` and contains **zero** analytics SDKs, advertising trackers, crash telemetry uploaders, or cloud synchronization services.
 
 - **No Personal Data Collection**: QRYPT never collects, transmits, sells, or shares your personal information, camera frames, location, contacts, or scan history with the developer or any third party.
-- **No Account Required**: All features—including real-time scanning, batch mode, Optical Generator Studio, and the Local Optical Vault—work immediately without sign-in or registration.
+- **No Account Required**: All features (including real-time scanning, batch mode, Optical Generator Studio, and the Local Optical Vault) work immediately without sign-in or registration.
 
 ---
 

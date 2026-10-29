@@ -1,0 +1,223 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" width="960" height="300" role="img" aria-label="QRYPT Real-Time Optical Engine Motion Telemetry">
+  <defs>
+    <linearGradient id="stageBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070B14" />
+      <stop offset="50%" stop-color="#0D1424" />
+      <stop offset="100%" stop-color="#121D30" />
+    </linearGradient>
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00E5FF" stop-opacity="0.55" />
+      <stop offset="50%" stop-color="#3B82F6" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#10B981" stop-opacity="0.55" />
+    </linearGradient>
+    <linearGradient id="cyanBeam" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00E5FF" stop-opacity="0" />
+      <stop offset="20%" stop-color="#00E5FF" stop-opacity="0.95" />
+      <stop offset="50%" stop-color="#F5FAFF" stop-opacity="1" />
+      <stop offset="80%" stop-color="#00E5FF" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#00E5FF" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="beamGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00E5FF" stop-opacity="0" />
+      <stop offset="50%" stop-color="#00E5FF" stop-opacity="0.24" />
+      <stop offset="100%" stop-color="#00E5FF" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="nodeSurface" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#121D30" />
+      <stop offset="100%" stop-color="#0D1424" />
+    </linearGradient>
+    <pattern id="opticalGrid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#00E5FF" stroke-opacity="0.06" stroke-width="1" />
+    </pattern>
+    <filter id="glowCyan" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <style>
+      .hud-font {
+        font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+      }
+      .title-font {
+        font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      .radar-ring-1 {
+        animation: ringExpand 3.6s ease-out infinite;
+        transform-origin: 155px 150px;
+      }
+      .radar-ring-2 {
+        animation: ringExpand 3.6s ease-out infinite 1.8s;
+        transform-origin: 155px 150px;
+      }
+      .flow-line {
+        stroke-dasharray: 8 8;
+        animation: dashFlow 1.6s linear infinite;
+      }
+      .status-dot {
+        animation: dotPulse 1.8s ease-in-out infinite;
+      }
+      .node-card-1 { animation: nodeHighlight 4s ease-in-out infinite 0s; }
+      .node-card-2 { animation: nodeHighlight 4s ease-in-out infinite 1s; }
+      .node-card-3 { animation: nodeHighlight 4s ease-in-out infinite 2s; }
+      .node-card-4 { animation: nodeHighlight 4s ease-in-out infinite 3s; }
+
+      @keyframes ringExpand {
+        0% { transform: scale(0.75); opacity: 0.65; }
+        100% { transform: scale(1.38); opacity: 0; }
+      }
+      @keyframes dashFlow {
+        to { stroke-dashoffset: -32; }
+      }
+      @keyframes dotPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.35; }
+      }
+      @keyframes nodeHighlight {
+        0%, 100% { stroke-opacity: 0.3; }
+        25% { stroke-opacity: 0.95; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .radar-ring-1, .radar-ring-2, .flow-line, .status-dot,
+        .node-card-1, .node-card-2, .node-card-3, .node-card-4 {
+          animation: none !important;
+        }
+      }
+    </style>
+  </defs>
+
+  <!-- Main Frame Background -->
+  <rect x="4" y="4" width="952" height="292" rx="24" fill="url(#stageBg)" stroke="url(#borderGrad)" stroke-width="2" />
+  <rect x="6" y="6" width="948" height="288" rx="22" fill="url(#opticalGrid)" />
+
+  <!-- Top Telemetry Bar -->
+  <rect x="24" y="20" width="912" height="34" rx="10" fill="#0D1424" fill-opacity="0.88" stroke="#00E5FF" stroke-opacity="0.2" stroke-width="1" />
+  <circle class="status-dot" cx="44" cy="37" r="4.5" fill="#10B981" />
+  <text x="58" y="41" class="hud-font" font-size="11" font-weight="700" fill="#F5FAFF" letter-spacing="1.2">QRYPT OPTICAL ENGINE TELEMETRY • REAL-TIME ON-DEVICE PIPELINE</text>
+  <text x="918" y="41" text-anchor="end" class="hud-font" font-size="11" font-weight="700" fill="#00E5FF" letter-spacing="1">0 NETWORK CALLS • v1.0.0</text>
+
+  <!-- LEFT STAGE: Live Animated Viewfinder HUD -->
+  <g>
+    <circle class="radar-ring-1" cx="155" cy="168" r="76" fill="none" stroke="#00E5FF" stroke-width="1.2" />
+    <circle class="radar-ring-2" cx="155" cy="168" r="76" fill="none" stroke="#3B82F6" stroke-width="1.2" />
+
+    <!-- Viewfinder Box -->
+    <rect x="65" y="78" width="180" height="180" rx="24" fill="#070B14" fill-opacity="0.9" stroke="#00E5FF" stroke-opacity="0.28" stroke-width="1.5" />
+
+    <!-- Corner Brackets -->
+    <path d="M81 112 V94 A6 6 0 0 1 87 88 H105" fill="none" stroke="#00E5FF" stroke-width="4" stroke-linecap="round" />
+    <path d="M205 88 H223 A6 6 0 0 1 229 94 V112" fill="none" stroke="#00E5FF" stroke-width="4" stroke-linecap="round" />
+    <path d="M81 224 V242 A6 6 0 0 0 87 248 H105" fill="none" stroke="#3B82F6" stroke-width="4" stroke-linecap="round" />
+    <path d="M205 248 H223 A6 6 0 0 0 229 242 V224" fill="none" stroke="#3B82F6" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Inner QR Matrix & 1D Bars -->
+    <rect x="97" y="106" width="38" height="38" rx="6" fill="none" stroke="#F5FAFF" stroke-width="5" />
+    <rect x="109" y="118" width="14" height="14" rx="2.5" fill="#00E5FF" />
+
+    <rect x="175" y="106" width="38" height="38" rx="6" fill="none" stroke="#F5FAFF" stroke-width="5" />
+    <rect x="187" y="118" width="14" height="14" rx="2.5" fill="#00E5FF" />
+
+    <rect x="97" y="182" width="38" height="38" rx="6" fill="none" stroke="#F5FAFF" stroke-width="5" />
+    <rect x="109" y="194" width="14" height="14" rx="2.5" fill="#00E5FF" />
+
+    <!-- Data Matrix & 1D Bars in 4th Quadrant -->
+    <rect x="175" y="182" width="7" height="38" rx="2" fill="#00E5FF" />
+    <rect x="186" y="182" width="4" height="38" rx="1.5" fill="#3B82F6" />
+    <rect x="194" y="182" width="8" height="38" rx="2" fill="#00E5FF" />
+    <rect x="206" y="182" width="5" height="38" rx="1.5" fill="#F5FAFF" />
+
+    <!-- Center Crosshair -->
+    <circle cx="155" cy="164" r="6" fill="none" stroke="#00E5FF" stroke-opacity="0.7" stroke-width="1.5" />
+    <circle cx="155" cy="164" r="2" fill="#00E5FF" />
+
+    <!-- Animated Laser Scan Sweep -->
+    <g filter="url(#glowCyan)">
+      <rect x="75" y="96" width="160" height="22" rx="4" fill="url(#beamGlow)">
+        <animate attributeName="y" values="90;214;90" dur="2.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" />
+      </rect>
+      <rect x="73" y="105" width="164" height="4.5" rx="2.25" fill="url(#cyanBeam)">
+        <animate attributeName="y" values="99;223;99" dur="2.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" />
+      </rect>
+    </g>
+
+    <!-- Bottom Viewfinder Pill -->
+    <rect x="86" y="232" width="138" height="19" rx="9.5" fill="#0D1424" stroke="#00E5FF" stroke-opacity="0.45" stroke-width="1" />
+    <text x="155" y="245" text-anchor="middle" class="hud-font" font-size="9.5" font-weight="700" fill="#00E5FF" letter-spacing="0.8">LOCKED • 14ms</text>
+  </g>
+
+  <!-- CONNECTOR LINES & ANIMATED DATA PULSES -->
+  <g>
+    <!-- Line from Viewfinder to Stage 1 & Stage 3 -->
+    <path class="flow-line" d="M 245 130 L 295 130" fill="none" stroke="#00E5FF" stroke-width="2" />
+    <path class="flow-line" d="M 245 208 L 295 208" fill="none" stroke="#3B82F6" stroke-width="2" />
+    <!-- Horizontal Connectors between Pipeline Cards -->
+    <path class="flow-line" d="M 495 130 L 535 130" fill="none" stroke="#00E5FF" stroke-width="2" />
+    <path class="flow-line" d="M 495 208 L 535 208" fill="none" stroke="#10B981" stroke-width="2" />
+    <!-- Connector to Right Summary Card -->
+    <path class="flow-line" d="M 735 168 L 768 168" fill="none" stroke="#00E5FF" stroke-width="2" />
+
+    <!-- Glowing Moving Data Packets -->
+    <circle r="4" fill="#00E5FF" filter="url(#glowCyan)">
+      <animateMotion path="M 245 130 L 295 130" dur="1.4s" repeatCount="indefinite" />
+    </circle>
+    <circle r="4" fill="#00E5FF" filter="url(#glowCyan)">
+      <animateMotion path="M 495 130 L 535 130" dur="1.4s" begin="0.4s" repeatCount="indefinite" />
+    </circle>
+    <circle r="4" fill="#10B981" filter="url(#glowCyan)">
+      <animateMotion path="M 495 208 L 535 208" dur="1.4s" begin="0.8s" repeatCount="indefinite" />
+    </circle>
+    <circle r="4" fill="#00E5FF" filter="url(#glowCyan)">
+      <animateMotion path="M 735 168 L 768 168" dur="1.4s" begin="1.1s" repeatCount="indefinite" />
+    </circle>
+  </g>
+
+  <!-- CENTER PIPELINE CARDS (2x2 Grid) -->
+  <!-- Card 1: CameraX + ML Kit -->
+  <g>
+    <rect class="node-card-1" x="295" y="78" width="200" height="84" rx="14" fill="url(#nodeSurface)" stroke="#00E5FF" stroke-width="1.5" />
+    <text x="311" y="102" class="hud-font" font-size="10" font-weight="700" fill="#00E5FF" letter-spacing="0.8">01 / OPTICAL SENSOR</text>
+    <text x="311" y="124" class="title-font" font-size="14.5" font-weight="700" fill="#F5FAFF">CameraX + ML Kit</text>
+    <text x="311" y="145" class="hud-font" font-size="10.5" fill="#A9B7C9">Zero-lag bundled scanner</text>
+  </g>
+
+  <!-- Card 2: ZXing 13-Format Engine -->
+  <g>
+    <rect class="node-card-2" x="535" y="78" width="200" height="84" rx="14" fill="url(#nodeSurface)" stroke="#00E5FF" stroke-width="1.5" />
+    <text x="551" y="102" class="hud-font" font-size="10" font-weight="700" fill="#00E5FF" letter-spacing="0.8">02 / MULTI-FORMAT</text>
+    <text x="551" y="124" class="title-font" font-size="14.5" font-weight="700" fill="#F5FAFF">13 Symbologies + GS1</text>
+    <text x="551" y="145" class="hud-font" font-size="10.5" fill="#A9B7C9">QR, Aztec, PDF417, EAN, UPC</text>
+  </g>
+
+  <!-- Card 3: Anti-Phishing URL Shield -->
+  <g>
+    <rect class="node-card-3" x="295" y="174" width="200" height="84" rx="14" fill="url(#nodeSurface)" stroke="#3B82F6" stroke-width="1.5" />
+    <text x="311" y="198" class="hud-font" font-size="10" font-weight="700" fill="#3B82F6" letter-spacing="0.8">03 / SECURITY SHIELD</text>
+    <text x="311" y="220" class="title-font" font-size="14.5" font-weight="700" fill="#F5FAFF">Anti-Phishing Inspector</text>
+    <text x="311" y="241" class="hud-font" font-size="10.5" fill="#A9B7C9">Punycode, IP &amp; TLD guard</text>
+  </g>
+
+  <!-- Card 4: Room SQLite Vault & Studio -->
+  <g>
+    <rect class="node-card-4" x="535" y="174" width="200" height="84" rx="14" fill="url(#nodeSurface)" stroke="#10B981" stroke-width="1.5" />
+    <text x="551" y="198" class="hud-font" font-size="10" font-weight="700" fill="#10B981" letter-spacing="0.8">04 / LOCAL STORAGE</text>
+    <text x="551" y="220" class="title-font" font-size="14.5" font-weight="700" fill="#F5FAFF">Room Vault &amp; Studio</text>
+    <text x="551" y="241" class="hud-font" font-size="10.5" fill="#A9B7C9">CSV, JSON &amp; 1536px PNG</text>
+  </g>
+
+  <!-- RIGHT STAGE: Live Specs & Privacy Guarantee -->
+  <g>
+    <rect x="768" y="78" width="168" height="180" rx="18" fill="#070B14" fill-opacity="0.92" stroke="#10B981" stroke-opacity="0.45" stroke-width="1.5" />
+    <rect x="784" y="94" width="136" height="22" rx="11" fill="#10B981" fill-opacity="0.14" stroke="#10B981" stroke-opacity="0.45" stroke-width="1" />
+    <text x="852" y="109" text-anchor="middle" class="hud-font" font-size="9.5" font-weight="700" fill="#10B981" letter-spacing="0.8">VERIFIED OFFLINE</text>
+
+    <text x="786" y="138" class="hud-font" font-size="10.5" font-weight="700" fill="#00E5FF">• 100% On-Device</text>
+    <text x="786" y="160" class="hud-font" font-size="10.5" font-weight="700" fill="#F5FAFF">• No Internet Perm</text>
+    <text x="786" y="182" class="hud-font" font-size="10.5" font-weight="700" fill="#F5FAFF">• Zero Storage Perm</text>
+    <text x="786" y="204" class="hud-font" font-size="10.5" font-weight="700" fill="#F5FAFF">• 12 Payload Schemas</text>
+    <text x="786" y="226" class="hud-font" font-size="10.5" font-weight="700" fill="#10B981">• SHA-256 Verified</text>
+
+    <line x1="786" y1="236" x2="918" y2="236" stroke="#00E5FF" stroke-opacity="0.2" stroke-width="1" />
+    <text x="852" y="250" text-anchor="middle" class="hud-font" font-size="9.5" fill="#A9B7C9">API 24 to 36 • Kotlin</text>
+  </g>
+</svg>

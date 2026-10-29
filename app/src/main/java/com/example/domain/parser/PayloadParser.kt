@@ -212,7 +212,7 @@ object PayloadParser {
                 riskLevel = SecurityRiskLevel.SUSPICIOUS,
                 host = urlString.take(40),
                 scheme = "unknown",
-                warnings = listOf("Malformed URI syntax — inspect carefully before opening")
+                warnings = listOf("Malformed URI syntax: inspect carefully before opening")
             )
         }
     }

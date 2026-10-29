@@ -654,7 +654,7 @@ private fun CameraPreviewWithAnalyzer(
                     onZoomBoundsUpdated(zoomState.zoomRatio, zoomState.maxZoomRatio)
                 }
             } catch (e: Exception) {
-                onCameraError("Camera stream unavailable in current environment — use Scan Image or Test Sample.")
+                onCameraError("Camera stream unavailable in current environment. Use Scan Image or Test Sample.")
             }
         }
         cameraProviderFuture.addListener(listener, ContextCompat.getMainExecutor(context))

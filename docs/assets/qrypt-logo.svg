@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="QRYPT Animated Optical Scanner Logo">
   <defs>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#070B14" />
@@ -10,32 +10,118 @@
       <stop offset="100%" stop-color="#3B82F6" />
     </linearGradient>
     <linearGradient id="laserGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.2" />
-      <stop offset="20%" stop-color="#00E5FF" />
-      <stop offset="50%" stop-color="#F5FAFF" />
-      <stop offset="80%" stop-color="#00E5FF" />
-      <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.2" />
+      <stop offset="0%" stop-color="#3B82F6" stop-opacity="0" />
+      <stop offset="15%" stop-color="#00E5FF" stop-opacity="0.85" />
+      <stop offset="50%" stop-color="#F5FAFF" stop-opacity="1" />
+      <stop offset="85%" stop-color="#00E5FF" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#3B82F6" stop-opacity="0" />
     </linearGradient>
+    <linearGradient id="laserTrail" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00E5FF" stop-opacity="0" />
+      <stop offset="50%" stop-color="#00E5FF" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#00E5FF" stop-opacity="0" />
+    </linearGradient>
+    <filter id="cyanGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <style>
+      .reticle-corner {
+        animation: reticlePulse 3.2s ease-in-out infinite;
+        transform-origin: 128px 128px;
+      }
+      .qr-core-1 {
+        animation: coreBlink 2.4s ease-in-out infinite 0s;
+      }
+      .qr-core-2 {
+        animation: coreBlink 2.4s ease-in-out infinite 0.4s;
+      }
+      .qr-core-3 {
+        animation: coreBlink 2.4s ease-in-out infinite 0.8s;
+      }
+      .bar-pulse-1 {
+        animation: barWave 1.8s ease-in-out infinite 0.1s;
+        transform-origin: center;
+        transform-box: fill-box;
+      }
+      .bar-pulse-2 {
+        animation: barWave 1.8s ease-in-out infinite 0.35s;
+        transform-origin: center;
+        transform-box: fill-box;
+      }
+      .bar-pulse-3 {
+        animation: barWave 1.8s ease-in-out infinite 0.6s;
+        transform-origin: center;
+        transform-box: fill-box;
+      }
+      .bar-pulse-4 {
+        animation: barWave 1.8s ease-in-out infinite 0.85s;
+        transform-origin: center;
+        transform-box: fill-box;
+      }
+      @keyframes reticlePulse {
+        0%, 100% { stroke-opacity: 0.95; }
+        50% { stroke-opacity: 0.55; }
+      }
+      @keyframes coreBlink {
+        0%, 100% { fill: #00E5FF; opacity: 1; }
+        50% { fill: #3B82F6; opacity: 0.65; }
+      }
+      @keyframes barWave {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .reticle-corner, .qr-core-1, .qr-core-2, .qr-core-3,
+        .bar-pulse-1, .bar-pulse-2, .bar-pulse-3, .bar-pulse-4 {
+          animation: none !important;
+        }
+      }
+    </style>
   </defs>
+
+  <!-- Outer Shell -->
   <rect x="8" y="8" width="240" height="240" rx="54" fill="url(#bgGrad)" stroke="url(#cyanBlue)" stroke-width="4" />
-  <rect x="28" y="28" width="200" height="200" rx="38" fill="#0D1424" fill-opacity="0.7" stroke="#00E5FF" stroke-opacity="0.35" stroke-width="2" />
+  <rect x="28" y="28" width="200" height="200" rx="38" fill="#0D1424" fill-opacity="0.78" stroke="#00E5FF" stroke-opacity="0.32" stroke-width="2" />
+
+  <!-- Subtle Optical Grid Lines -->
+  <line x1="128" y1="36" x2="128" y2="220" stroke="#00E5FF" stroke-opacity="0.08" stroke-width="1.5" stroke-dasharray="4 4" />
+  <line x1="36" y1="128" x2="220" y2="128" stroke="#00E5FF" stroke-opacity="0.08" stroke-width="1.5" stroke-dasharray="4 4" />
+
   <!-- Outer Reticle Brackets -->
-  <path d="M46 78 V54 A8 8 0 0 1 54 46 H78" fill="none" stroke="#00E5FF" stroke-width="7" stroke-linecap="round" />
-  <path d="M178 46 H202 A8 8 0 0 1 210 54 V78" fill="none" stroke="#00E5FF" stroke-width="7" stroke-linecap="round" />
-  <path d="M46 178 V202 A8 8 0 0 0 54 210 H78" fill="none" stroke="#3B82F6" stroke-width="7" stroke-linecap="round" />
-  <path d="M178 210 H202 A8 8 0 0 0 210 202 V178" fill="none" stroke="#3B82F6" stroke-width="7" stroke-linecap="round" />
+  <g class="reticle-corner">
+    <path d="M46 78 V54 A8 8 0 0 1 54 46 H78" fill="none" stroke="#00E5FF" stroke-width="7" stroke-linecap="round" />
+    <path d="M178 46 H202 A8 8 0 0 1 210 54 V78" fill="none" stroke="#00E5FF" stroke-width="7" stroke-linecap="round" />
+    <path d="M46 178 V202 A8 8 0 0 0 54 210 H78" fill="none" stroke="#3B82F6" stroke-width="7" stroke-linecap="round" />
+    <path d="M178 210 H202 A8 8 0 0 0 210 202 V178" fill="none" stroke="#3B82F6" stroke-width="7" stroke-linecap="round" />
+  </g>
+
   <!-- 3 QR Finder Squares -->
   <rect x="66" y="66" width="46" height="46" rx="8" fill="none" stroke="#F5FAFF" stroke-width="7" />
-  <rect x="81" y="81" width="16" height="16" rx="3" fill="#00E5FF" />
+  <rect class="qr-core-1" x="81" y="81" width="16" height="16" rx="3" fill="#00E5FF" />
+
   <rect x="144" y="66" width="46" height="46" rx="8" fill="none" stroke="#F5FAFF" stroke-width="7" />
-  <rect x="159" y="81" width="16" height="16" rx="3" fill="#00E5FF" />
+  <rect class="qr-core-2" x="159" y="81" width="16" height="16" rx="3" fill="#00E5FF" />
+
   <rect x="66" y="144" width="46" height="46" rx="8" fill="none" stroke="#F5FAFF" stroke-width="7" />
-  <rect x="81" y="159" width="16" height="16" rx="3" fill="#00E5FF" />
+  <rect class="qr-core-3" x="81" y="159" width="16" height="16" rx="3" fill="#00E5FF" />
+
   <!-- 4th Quadrant 1D Barcode Bars -->
-  <rect x="144" y="144" width="10" height="46" rx="2" fill="url(#cyanBlue)" />
-  <rect x="160" y="144" width="6" height="46" rx="2" fill="url(#cyanBlue)" />
-  <rect x="172" y="144" width="10" height="46" rx="2" fill="url(#cyanBlue)" />
-  <rect x="186" y="144" width="5" height="46" rx="2" fill="url(#cyanBlue)" />
-  <!-- Laser Scan Beam -->
-  <rect x="38" y="124" width="180" height="8" rx="4" fill="url(#laserGrad)" />
+  <rect class="bar-pulse-1" x="144" y="144" width="10" height="46" rx="2" fill="url(#cyanBlue)" />
+  <rect class="bar-pulse-2" x="160" y="144" width="6" height="46" rx="2" fill="url(#cyanBlue)" />
+  <rect class="bar-pulse-3" x="172" y="144" width="10" height="46" rx="2" fill="url(#cyanBlue)" />
+  <rect class="bar-pulse-4" x="186" y="144" width="5" height="46" rx="2" fill="url(#cyanBlue)" />
+
+  <!-- Sweeping Optical Laser Scan Assembly (SMIL + Filter Glow) -->
+  <g filter="url(#cyanGlow)">
+    <rect x="38" y="60" width="180" height="28" rx="6" fill="url(#laserTrail)">
+      <animate attributeName="y" values="52;176;52" dur="3.2s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" />
+    </rect>
+    <rect x="36" y="70" width="184" height="7" rx="3.5" fill="url(#laserGrad)">
+      <animate attributeName="y" values="62;186;62" dur="3.2s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" />
+    </rect>
+  </g>
 </svg>

@@ -1,6 +1,6 @@
 # Contributing to QRYPT
 
-Thank you for your interest in contributing to **QRYPT — Scan Smarter. Instantly.**! This document provides guidelines and instructions for building, testing, and submitting improvements to the project.
+Thank you for your interest in contributing to **QRYPT: Scan Smarter. Instantly.**! This document provides guidelines and instructions for building, testing, and submitting improvements to the project.
 
 ---
 
@@ -20,17 +20,17 @@ Thank you for your interest in contributing to **QRYPT — Scan Smarter. Instant
 
 QRYPT follows a modular, unidirectional **Clean Architecture + MVVM** structure inside `app/src/main/java/com/example/`:
 
-- **`domain/model/`** — Immutable domain models (`BarcodeFormatType`, `ParsedPayload`, `ParsedPayloadType`, `UrlSecurityReport`, `SecurityRiskLevel`, `ScanRegionMode`, `DetectedBarcodeFrame`, `QrCustomizationConfig`).
-- **`domain/parser/`** — `PayloadParser`: Zero-dependency offline parser, GTIN Modulo-10 checksum calculator, GS1 country prefix lookup, and URL anti-phishing heuristic analyzer.
-- **`engine/`** —
+- **`domain/model/`**: Immutable domain models (`BarcodeFormatType`, `ParsedPayload`, `ParsedPayloadType`, `UrlSecurityReport`, `SecurityRiskLevel`, `ScanRegionMode`, `DetectedBarcodeFrame`, `QrCustomizationConfig`).
+- **`domain/parser/`**: `PayloadParser`: Zero-dependency offline parser, GTIN Modulo-10 checksum calculator, GS1 country prefix lookup, and URL anti-phishing heuristic analyzer.
+- **`engine/`**:
   - `BarcodeScannerEngine`: CameraX `ImageAnalysis.Analyzer` powered by Google ML Kit Barcode Scanning + ZXing Multi-Format Reader for static bitmaps.
   - `BarcodeGeneratorEngine`: 13-format barcode & QR matrix generator with custom styling.
   - `FeedbackController`: Tactile vibration and acoustic beep confirmation.
-- **`data/`** —
+- **`data/`**:
   - `local/`: Room SQLite database (`PrismScanDatabase`, `ScanRecordDao`, `ScanRecordEntity`).
   - `repository/`: `ScanRepository` with duplicate cooldown suppression and RFC-4180 CSV/JSON export.
   - `preferences/`: `SettingsRepository` backed by Jetpack DataStore Preferences.
-- **`ui/`** —
+- **`ui/`**:
   - `theme/`: `PrismScanTheme`, `Color.kt`, `Type.kt` (locally bundled `Space Grotesk`, `Plus Jakarta Sans`, `JetBrains Mono`).
   - `components/`: `LiquidGlassComponents.kt`, `ScanResultSheet.kt`.
   - `screens/`: `ScannerScreen.kt`, `BatchScannerScreen.kt`, `GeneratorStudioScreen.kt`, `HistoryVaultScreen.kt`, `SettingsScreen.kt`.

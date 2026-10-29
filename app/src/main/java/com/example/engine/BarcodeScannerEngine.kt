@@ -139,7 +139,7 @@ class BarcodeScannerEngine(
                 onBarcodesDetected(validFrames)
             }
             .addOnFailureListener {
-                // Frame drop or transient error — keep camera stream running smoothly
+                // Frame drop or transient error; keep camera stream running smoothly
             }
             .addOnCompleteListener {
                 imageProxy.close()
