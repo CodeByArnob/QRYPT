@@ -32,18 +32,19 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Android SDK Licenses & Install API 36
+      - name: Accept Android SDK Licenses
         run: |
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+          SDKMANAGER="${ANDROID_HOME:-/usr/local/lib/android/sdk}/cmdline-tools/latest/bin/sdkmanager"
+          if [ -x "$SDKMANAGER" ]; then
+            yes | "$SDKMANAGER" --licenses > /dev/null || true
+          else
+            yes | sdkmanager --licenses > /dev/null || true
+          fi
 
-      - name: Set up Gradle
+      - name: Set up Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '9.0.0'
+          gradle-version: '9.3.1'
 
       - name: Restore Debug Keystore
         run: |
@@ -52,13 +53,13 @@ jobs:
           fi
 
       - name: Run Unit & Robolectric Tests
-        run: gradle :app:testDebugUnitTest --stacktrace
+        run: gradle :app:testDebugUnitTest --no-configuration-cache --stacktrace
 
       - name: Run Android Lint
-        run: gradle :app:lintDebug --stacktrace
+        run: gradle :app:lintDebug --no-configuration-cache --stacktrace
 
       - name: Assemble Debug APK
-        run: gradle :app:assembleDebug --stacktrace
+        run: gradle :app:assembleDebug --no-configuration-cache --stacktrace
 
       - name: Verify Generated APK Artifact
         run: |

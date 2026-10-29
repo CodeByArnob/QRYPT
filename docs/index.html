@@ -3,58 +3,163 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QRYPT — Scan Smarter. Instantly. | Offline QR &amp; Barcode Scanner</title>
-  <meta name="description" content="QRYPT is a 100% offline Android QR &amp; 13-format Barcode Scanner, Batch Inventory Scanner, and Optical Generator Studio by Arnobrazz." />
+  <title>QRYPT — QR &amp; Barcode Scanner | Scan Smarter. Instantly. (Offline Android App)</title>
+  <meta name="description" content="QRYPT is an open-source, 100% offline Android QR &amp; 13-format Barcode Scanner, Batch Inventory Engine, Offline Anti-Phishing URL Analyzer, and Custom QR Studio by ArnobRazz." />
+  <meta name="keywords" content="Android QR scanner, offline barcode scanner, open source QR code app, Jetpack Compose scanner, CameraX ML Kit ZXing, batch barcode inventory, QR code generator Android, QRYPT, ArnobRazz" />
+  <meta name="author" content="ArnobRazz" />
+  <meta name="theme-color" content="#070B14" />
+  <link rel="canonical" href="https://codebyarnob.github.io/QRYPT/" />
   <link rel="icon" type="image/svg+xml" href="assets/qrypt-logo.svg" />
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="QRYPT — QR &amp; Barcode Scanner" />
+  <meta property="og:title" content="QRYPT — Scan Smarter. Instantly. | Offline Android QR &amp; Barcode Scanner" />
+  <meta property="og:description" content="High-precision, 100% offline Android QR &amp; 13-format barcode scanner, batch inventory processor, anti-phishing link shield, and 1024px QR studio by ArnobRazz." />
+  <meta property="og:url" content="https://codebyarnob.github.io/QRYPT/" />
+  <meta property="og:image" content="https://codebyarnob.github.io/QRYPT/assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="QRYPT Android QR and Barcode Scanner interface preview showing live optical viewfinder and security result sheet" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="QRYPT — Scan Smarter. Instantly. | Open-Source Android QR &amp; Barcode Scanner" />
+  <meta name="twitter:description" content="100% offline Android QR &amp; 13-format barcode scanner with batch inventory mode, URL anti-phishing heuristics, and custom QR studio." />
+  <meta name="twitter:image" content="https://codebyarnob.github.io/QRYPT/assets/og-banner.png" />
+
+  <!-- Structured Data (Truthful SoftwareApplication Schema) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "QRYPT — QR & Barcode Scanner",
+    "operatingSystem": "Android 7.0+ (API 24–36)",
+    "applicationCategory": "UtilitiesApplication",
+    "softwareVersion": "1.0.0",
+    "license": "https://opensource.org/licenses/MIT",
+    "url": "https://codebyarnob.github.io/QRYPT/",
+    "downloadUrl": "https://github.com/CodeByArnob/QRYPT/releases/download/v1.0.0/QRYPT-v1.0.0-release.apk",
+    "releaseNotes": "https://github.com/CodeByArnob/QRYPT/releases/tag/v1.0.0",
+    "codeRepository": "https://github.com/CodeByArnob/QRYPT",
+    "author": {
+      "@type": "Person",
+      "name": "ArnobRazz",
+      "url": "https://github.com/CodeByArnob"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+
   <style>
     :root {
       --bg-primary: #070B14;
       --bg-surface: #0D1424;
       --bg-elevated: #121D30;
+      --bg-glass: rgba(13, 20, 36, 0.84);
       --accent-cyan: #00E5FF;
+      --accent-cyan-soft: rgba(0, 229, 255, 0.12);
       --accent-blue: #3B82F6;
       --text-primary: #F5FAFF;
       --text-secondary: #A9B7C9;
+      --text-muted: #7B8CA3;
       --safe-emerald: #10B981;
-      --border-subtle: rgba(0, 229, 255, 0.22);
-      --radius-lg: 20px;
-      --radius-md: 14px;
+      --warn-amber: #F59E0B;
+      --danger-crimson: #EF4444;
+      --border-subtle: rgba(0, 229, 255, 0.2);
+      --border-card: rgba(169, 183, 201, 0.14);
+      --shadow-elevated: 0 20px 50px rgba(0, 0, 0, 0.55);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --max-w: 1200px;
     }
 
-    * {
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+      color-scheme: dark;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", "Inter", "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg-primary);
       background-image:
-        radial-gradient(circle at 15% 8%, rgba(0, 229, 255, 0.12) 0%, transparent 45%),
-        radial-gradient(circle at 85% 88%, rgba(59, 130, 246, 0.12) 0%, transparent 45%);
+        radial-gradient(circle at 12% 6%, rgba(0, 229, 255, 0.11) 0%, transparent 40%),
+        radial-gradient(circle at 88% 18%, rgba(59, 130, 246, 0.10) 0%, transparent 42%),
+        radial-gradient(circle at 50% 92%, rgba(0, 229, 255, 0.07) 0%, transparent 45%);
       color: var(--text-primary);
-      line-height: 1.6;
+      line-height: 1.65;
       min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Skip Link for Keyboard Accessibility */
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 16px;
+      background: var(--accent-cyan);
+      color: #070B14;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      z-index: 9999;
+      transition: top 0.2s ease;
+    }
+
+    .skip-link:focus {
+      top: 14px;
+      outline: 3px solid var(--text-primary);
     }
 
     a {
       color: var(--accent-cyan);
       text-decoration: none;
+      transition: color 0.18s ease, border-color 0.18s ease;
+    }
+
+    a:hover {
+      color: #66F0FF;
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    summary:focus-visible {
+      outline: 2px solid var(--accent-cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    code, pre, .mono {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
 
     .container {
-      max-width: 1160px;
+      max-width: var(--max-w);
       margin: 0 auto;
       padding: 0 24px;
     }
 
-    header {
+    /* Sticky Navigation Header */
+    .site-header {
       position: sticky;
       top: 0;
-      z-index: 20;
-      backdrop-filter: blur(16px);
-      background: rgba(7, 11, 20, 0.85);
+      z-index: 100;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      background: rgba(7, 11, 20, 0.86);
       border-bottom: 1px solid var(--border-subtle);
     }
 
@@ -62,373 +167,1661 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 72px;
+      min-height: 74px;
+      gap: 16px;
     }
 
     .brand {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 12px;
+      color: var(--text-primary);
       font-weight: 800;
-      font-size: 1.35rem;
+      font-size: 1.3rem;
       letter-spacing: -0.02em;
+    }
+
+    .brand:hover {
       color: var(--text-primary);
     }
 
     .brand img {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
+      box-shadow: 0 0 18px rgba(0, 229, 255, 0.22);
+    }
+
+    .brand-meta {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
     }
 
     .brand-tagline {
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       color: var(--accent-cyan);
       font-weight: 600;
-      display: block;
+      letter-spacing: 0.02em;
     }
 
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 22px;
+      list-style: none;
     }
 
     .nav-links a {
       color: var(--text-secondary);
-      font-size: 0.95rem;
+      font-size: 0.93rem;
       font-weight: 600;
-      transition: color 0.18s ease;
     }
 
     .nav-links a:hover {
       color: var(--accent-cyan);
     }
 
-    .btn-primary {
+    .nav-cta-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Buttons */
+    .btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-      color: #070B14;
-      font-weight: 700;
-      padding: 12px 22px;
+      justify-content: center;
+      gap: 10px;
+      padding: 13px 24px;
       border-radius: 999px;
-      font-size: 0.95rem;
-      box-shadow: 0 0 24px rgba(0, 229, 255, 0.25);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      font-weight: 700;
+      font-size: 0.96rem;
+      line-height: 1.2;
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+      white-space: nowrap;
+    }
+
+    .btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%);
+      color: #070B14;
+      border: 1px solid transparent;
+      box-shadow: 0 8px 28px rgba(0, 229, 255, 0.26);
     }
 
     .btn-primary:hover {
       transform: translateY(-1px);
-      box-shadow: 0 0 32px rgba(0, 229, 255, 0.4);
+      box-shadow: 0 12px 34px rgba(0, 229, 255, 0.38);
       color: #070B14;
     }
 
-    .btn-outline {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+    .btn-secondary {
       background: var(--bg-surface);
       color: var(--text-primary);
       border: 1px solid var(--border-subtle);
-      font-weight: 600;
-      padding: 12px 22px;
-      border-radius: 999px;
-      font-size: 0.95rem;
     }
 
-    .btn-outline:hover {
+    .btn-secondary:hover {
       border-color: var(--accent-cyan);
       color: var(--accent-cyan);
+      background: var(--bg-elevated);
     }
 
+    .btn-sm {
+      padding: 9px 18px;
+      font-size: 0.88rem;
+    }
+
+    /* Hero Section */
     .hero {
-      padding: 72px 0 48px;
-      text-align: center;
+      padding: 68px 0 64px;
     }
 
-    .badge {
-      display: inline-block;
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: rgba(0, 229, 255, 0.12);
-      border: 1px solid var(--border-subtle);
-      color: var(--accent-cyan);
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
       margin-bottom: 20px;
     }
 
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: var(--accent-cyan-soft);
+      border: 1px solid var(--border-subtle);
+      color: var(--accent-cyan);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .badge-secondary {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #34D399;
+    }
+
     .hero h1 {
-      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-size: clamp(2.4rem, 4.8vw, 3.85rem);
       font-weight: 800;
       letter-spacing: -0.03em;
-      line-height: 1.15;
+      line-height: 1.1;
       margin-bottom: 18px;
     }
 
     .hero h1 span {
-      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+      background: linear-gradient(92deg, var(--accent-cyan) 0%, #60A5FA 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .hero p {
-      max-width: 720px;
-      margin: 0 auto 32px;
+    .hero-lead {
       color: var(--text-secondary);
       font-size: 1.12rem;
+      margin-bottom: 28px;
+      max-width: 620px;
     }
 
     .hero-actions {
       display: flex;
-      justify-content: center;
       flex-wrap: wrap;
       gap: 14px;
+      margin-bottom: 22px;
     }
 
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      padding-top: 14px;
+      border-top: 1px solid var(--border-card);
+    }
+
+    .hero-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-meta strong {
+      color: var(--text-primary);
+    }
+
+    /* Hero Dual Phone Preview */
+    .hero-showcase {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .phone-frame {
+      background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-elevated) 100%);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: 26px;
+      padding: 10px;
+      box-shadow: var(--shadow-elevated);
+    }
+
+    .phone-frame.secondary-frame {
+      transform: translateY(18px);
+    }
+
+    .phone-frame img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 18px;
+    }
+
+    .phone-caption {
+      text-align: center;
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      font-weight: 600;
+    }
+
+    /* Key Specs Bar */
+    .specs-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 12px 0 40px;
+    }
+
+    .spec-item {
+      background: linear-gradient(180deg, var(--bg-surface) 0%, rgba(18, 29, 48, 0.7) 100%);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .spec-value {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      letter-spacing: -0.02em;
+      display: block;
+    }
+
+    .spec-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Sections */
     .section {
-      padding: 56px 0;
+      padding: 68px 0;
+      border-top: 1px solid rgba(169, 183, 201, 0.08);
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 740px;
+      margin: 0 auto 44px;
+    }
+
+    .section-eyebrow {
+      display: inline-block;
+      color: var(--accent-cyan);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
     }
 
     .section-title {
-      font-size: 1.85rem;
+      font-size: clamp(1.75rem, 3.2vw, 2.4rem);
       font-weight: 800;
-      margin-bottom: 10px;
-      text-align: center;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
     }
 
     .section-subtitle {
-      text-align: center;
       color: var(--text-secondary);
-      max-width: 680px;
-      margin: 0 auto 36px;
+      font-size: 1.02rem;
     }
 
-    .screenshots-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 20px;
-    }
-
-    .shot-card {
-      background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 14px;
-      text-align: center;
-    }
-
-    .shot-card img {
-      width: 100%;
-      height: auto;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      margin-bottom: 10px;
-    }
-
-    .shot-card h3 {
-      font-size: 0.98rem;
-      margin-bottom: 4px;
-    }
-
-    .shot-card p {
-      font-size: 0.84rem;
-      color: var(--text-secondary);
-    }
-
+    /* Feature Grid */
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 22px;
     }
 
     .feature-card {
-      background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
-      border: 1px solid var(--border-subtle);
+      background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-elevated) 100%);
+      border: 1px solid var(--border-card);
       border-radius: var(--radius-lg);
-      padding: 24px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-subtle);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--accent-cyan-soft);
+      border: 1px solid var(--border-subtle);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-cyan);
     }
 
     .feature-card h3 {
-      color: var(--accent-cyan);
-      font-size: 1.15rem;
-      margin-bottom: 8px;
+      font-size: 1.18rem;
+      font-weight: 700;
+      color: var(--text-primary);
     }
 
     .feature-card p {
       color: var(--text-secondary);
       font-size: 0.94rem;
+      flex-grow: 1;
     }
 
-    .formats-bar {
+    .feature-tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+      list-style: none;
+    }
+
+    .feature-tag-list li {
+      font-size: 0.76rem;
+      font-family: "JetBrains Mono", monospace;
+      color: var(--accent-cyan);
+      background: rgba(7, 11, 20, 0.65);
+      border: 1px solid rgba(0, 229, 255, 0.18);
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    /* Use Cases Grid */
+    .use-cases-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 28px;
+    }
+
+    .use-case-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      padding: 22px;
+    }
+
+    .use-case-card h4 {
+      color: var(--accent-cyan);
+      font-size: 1.02rem;
+      margin-bottom: 8px;
+    }
+
+    .use-case-card p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Screenshots Gallery & Filter Controls */
+    .filter-bar {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 10px;
-      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+
+    .filter-btn {
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-card);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .filter-btn:hover,
+    .filter-btn[aria-pressed="true"] {
+      background: var(--accent-cyan-soft);
+      color: var(--accent-cyan);
+      border-color: var(--accent-cyan);
+    }
+
+    .screenshots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 22px;
+    }
+
+    .shot-card {
+      background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-elevated) 100%);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .shot-card:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+    }
+
+    .shot-card[hidden] {
+      display: none !important;
+    }
+
+    .shot-img-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: zoom-in;
+      display: block;
+      width: 100%;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .shot-img-btn img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .shot-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .shot-step {
+      font-size: 0.74rem;
+      font-family: "JetBrains Mono", monospace;
+      color: var(--accent-cyan);
+      background: var(--accent-cyan-soft);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    .shot-theme-tag {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .shot-card h3 {
+      font-size: 1.02rem;
+      margin-bottom: 6px;
+      color: var(--text-primary);
+    }
+
+    .shot-card p {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+    }
+
+    /* Formats Matrix Table */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-card);
+      background: var(--bg-surface);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-card);
+      font-size: 0.93rem;
+    }
+
+    th {
+      background: var(--bg-elevated);
+      color: var(--accent-cyan);
+      font-weight: 700;
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .format-chip {
-      padding: 6px 14px;
-      background: var(--bg-surface);
+      padding: 5px 12px;
+      background: var(--bg-elevated);
       border: 1px solid var(--border-subtle);
-      border-radius: 10px;
-      font-family: monospace;
-      font-size: 0.86rem;
+      border-radius: 8px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem;
       color: var(--accent-cyan);
     }
 
-    footer {
-      border-top: 1px solid var(--border-subtle);
-      padding: 36px 0;
+    /* Privacy & Permissions Split */
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .panel-card {
+      background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-elevated) 100%);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+    }
+
+    .panel-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .check-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .check-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.94rem;
+      color: var(--text-secondary);
+    }
+
+    .check-list li strong {
+      color: var(--text-primary);
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--safe-emerald);
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    /* Installation & Code Blocks */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .step-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-cyan-soft);
+      border: 1px solid var(--border-subtle);
+      color: var(--accent-cyan);
+      font-weight: 800;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+
+    .code-box {
+      background: #050810;
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      overflow-x: auto;
+      font-size: 0.84rem;
+      color: #D6E4FF;
+      margin-top: 12px;
+    }
+
+    .notice-box {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+    }
+
+    .notice-box strong {
+      color: var(--text-primary);
+    }
+
+    /* FAQ Accordion */
+    .faq-list {
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    details.faq-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+      transition: border-color 0.18s ease;
+    }
+
+    details.faq-item[open] {
+      border-color: var(--border-subtle);
+      background: var(--bg-elevated);
+    }
+
+    details.faq-item summary {
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    details.faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.faq-item summary::after {
+      content: "+";
+      color: var(--accent-cyan);
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    details.faq-item[open] summary::after {
+      content: "−";
+    }
+
+    details.faq-item .faq-body {
+      margin-top: 12px;
+      color: var(--text-secondary);
+      font-size: 0.94rem;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-card);
+    }
+
+    /* Lightbox Modal */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 14, 0.92);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 24px;
+    }
+
+    .lightbox[aria-hidden="false"] {
+      display: flex;
+    }
+
+    .lightbox-content {
+      max-width: 420px;
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
       text-align: center;
+    }
+
+    .lightbox-content img {
+      max-height: 75vh;
+      width: auto;
+      max-width: 100%;
+      border-radius: 12px;
+      margin: 0 auto 12px;
+      display: block;
+    }
+
+    .lightbox-close {
+      margin-top: 10px;
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--border-subtle);
+      background: #050811;
+      padding: 56px 0 40px;
+      margin-top: 40px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 36px;
+    }
+
+    .footer-col h4 {
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .footer-col a {
       color: var(--text-secondary);
       font-size: 0.9rem;
-      margin-top: 40px;
+    }
+
+    .footer-col a:hover {
+      color: var(--accent-cyan);
+    }
+
+    .footer-bottom {
+      padding-top: 24px;
+      border-top: 1px solid var(--border-card);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-secondary);
+      font-size: 0.86rem;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 960px) {
+      .hero-grid,
+      .split-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-showcase {
+        max-width: 520px;
+        margin: 0 auto;
+      }
+
+      .specs-strip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .menu-toggle {
+        display: inline-flex;
+      }
+
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 74px;
+        left: 0;
+        right: 0;
+        background: var(--bg-surface);
+        border-bottom: 1px solid var(--border-subtle);
+        flex-direction: column;
+        padding: 20px 24px;
+        gap: 14px;
+        align-items: flex-start;
+      }
+
+      .nav-links.open {
+        display: flex;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Reduced Motion Preference */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
   </style>
 </head>
 <body>
-  <header>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
     <div class="container nav-bar">
-      <div class="brand">
-        <img src="assets/qrypt-logo.svg" alt="QRYPT Logo" />
-        <div>
-          QRYPT
+      <a href="#top" class="brand" aria-label="QRYPT — QR and Barcode Scanner Home">
+        <img src="assets/qrypt-logo.svg" alt="QRYPT optical reticle logo" width="42" height="42" />
+        <span class="brand-meta">
+          <span>QRYPT</span>
           <span class="brand-tagline">Scan Smarter. Instantly.</span>
-        </div>
-      </div>
-      <nav class="nav-links">
-        <a href="#screenshots">Screenshots</a>
-        <a href="#features">Features</a>
-        <a href="#privacy">Privacy</a>
-        <a href="https://github.com/CodeByArnob/QRYPT" target="_blank" rel="noopener">GitHub</a>
-        <a class="btn-primary" href="https://github.com/CodeByArnob/QRYPT/releases/latest">Download APK</a>
+        </span>
+      </a>
+
+      <button class="menu-toggle" type="button" id="menuToggle" aria-expanded="false" aria-controls="primaryNav">
+        Menu
+      </button>
+
+      <nav aria-label="Primary Navigation">
+        <ul class="nav-links" id="primaryNav">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#screenshots">Screenshots</a></li>
+          <li><a href="#formats">Formats</a></li>
+          <li><a href="#privacy">Privacy</a></li>
+          <li><a href="#install">Install</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="https://github.com/CodeByArnob/QRYPT" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+        </ul>
       </nav>
+
+      <div class="nav-cta-group">
+        <a class="btn btn-primary btn-sm" href="https://github.com/CodeByArnob/QRYPT/releases/download/v1.0.0/QRYPT-v1.0.0-release.apk">
+          Download APK
+        </a>
+      </div>
     </div>
   </header>
 
-  <main class="container">
-    <section class="hero">
-      <span class="badge">v1.0.0 • 100% Offline Android Utility</span>
-      <h1>Scan Smarter. <span>Instantly.</span></h1>
-      <p>
-        Next-generation QR &amp; 13-format Barcode Scanner, Batch Inventory Engine, Offline Anti-Phishing URL Analyzer, and Liquid Glass Generator Studio engineered with Kotlin &amp; Jetpack Compose.
-      </p>
-      <div class="hero-actions">
-        <a class="btn-primary" href="https://github.com/CodeByArnob/QRYPT/releases/latest">Download Latest Release APK</a>
-        <a class="btn-outline" href="https://github.com/CodeByArnob/QRYPT">View Source on GitHub</a>
-      </div>
+  <main id="main-content">
+    <!-- Hero Section -->
+    <section class="hero" id="top">
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <div class="pill-row">
+              <span class="badge">v1.0.0 Release • Open Source (MIT)</span>
+              <span class="badge badge-secondary">100% Offline • Zero Internet Permission</span>
+            </div>
 
-      <div class="formats-bar">
-        <span class="format-chip">QR Code</span>
-        <span class="format-chip">Aztec</span>
-        <span class="format-chip">Data Matrix</span>
-        <span class="format-chip">PDF417</span>
-        <span class="format-chip">EAN-13 / ISBN</span>
-        <span class="format-chip">EAN-8</span>
-        <span class="format-chip">UPC-A</span>
-        <span class="format-chip">UPC-E</span>
-        <span class="format-chip">Code 128</span>
-        <span class="format-chip">Code 39</span>
-        <span class="format-chip">Code 93</span>
-        <span class="format-chip">Codabar</span>
-        <span class="format-chip">ITF</span>
-      </div>
-    </section>
+            <h1>Scan Smarter. <span>Instantly.</span></h1>
 
-    <section id="screenshots" class="section">
-      <h2 class="section-title">Genuine Application Screenshots</h2>
-      <p class="section-subtitle">
-        Captured directly from QRYPT's Jetpack Compose UI rendering pipeline across Dark (#070B14) and Frosted Daylight themes.
-      </p>
-      <div class="screenshots-grid">
-        <div class="shot-card">
-          <img src="screenshots/01-scanner-screen.png" alt="QRYPT Scanner Screen" loading="lazy" />
-          <h3>1. Optical Scanner HUD</h3>
-          <p>Precision Square, 1D Laser Slit, Torch, Low-Light Boost &amp; Photo Library access.</p>
+            <p class="hero-lead">
+              <strong>QRYPT — QR &amp; Barcode Scanner</strong> is a fast, privacy-first Android optical utility engineered by <strong>ArnobRazz</strong>. Decode 13 industrial and retail barcode formats in real time, inspect links with offline anti-phishing heuristics, run batch inventory sessions, and generate 1024px HD custom QR codes—with zero cloud tracking or network permissions.
+            </p>
+
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="https://github.com/CodeByArnob/QRYPT/releases/download/v1.0.0/QRYPT-v1.0.0-release.apk" aria-label="Download QRYPT v1.0.0 APK for Android">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Download for Android (v1.0.0 APK)
+              </a>
+
+              <a class="btn btn-secondary" href="https://github.com/CodeByArnob/QRYPT" target="_blank" rel="noopener noreferrer" aria-label="Explore QRYPT source code on GitHub">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.92.58.1.79-.25.79-.56v-2.01c-3.2.7-3.88-1.39-3.88-1.39-.52-1.33-1.28-1.68-1.28-1.68-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11.02 11.02 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/>
+                </svg>
+                Explore on GitHub
+              </a>
+            </div>
+
+            <div class="hero-meta">
+              <span>Developer: <strong>ArnobRazz (@CodeByArnob)</strong></span>
+              <span>Target: <strong>Android 7.0+ (API 24–36)</strong></span>
+              <span>Release Notes &amp; SHA-256: <a href="https://github.com/CodeByArnob/QRYPT/releases/tag/v1.0.0">v1.0.0 Release</a></span>
+            </div>
+          </div>
+
+          <div class="hero-showcase" aria-label="Genuine QRYPT Android interface screenshots">
+            <div class="phone-frame">
+              <img src="screenshots/01-scanner-screen.png" alt="QRYPT Live Optical Scanner screen showing Precision Square reticle, 1D Laser Slit toggle, Torch, Low-Light Boost, and Photo Library controls" width="360" height="800" />
+              <div class="phone-caption">Optical Scanner HUD (#070B14)</div>
+            </div>
+            <div class="phone-frame secondary-frame">
+              <img src="screenshots/02-scan-result-sheet.png" alt="QRYPT Smart Result Sheet showing verified HTTPS security shield, parsed URL details, and one-tap actions" width="360" height="800" />
+              <div class="phone-caption">Offline Security Result Sheet</div>
+            </div>
+          </div>
         </div>
-        <div class="shot-card">
-          <img src="screenshots/02-scan-result-sheet.png" alt="QRYPT Scan Result Sheet" loading="lazy" />
-          <h3>2. Smart Result &amp; Security Shield</h3>
-          <p>Offline URL heuristic verification, structured metadata &amp; one-tap actions.</p>
-        </div>
-        <div class="shot-card">
-          <img src="screenshots/03-image-scan-and-modes.png" alt="QRYPT Continuous & Slit Mode" loading="lazy" />
-          <h3>3. Continuous &amp; 1D Slit Mode</h3>
-          <p>Dedicated 1D barcode laser slit and uninterrupted continuous stream capture.</p>
-        </div>
-        <div class="shot-card">
-          <img src="screenshots/04-batch-scanner-screen.png" alt="QRYPT Batch Scanner" loading="lazy" />
-          <h3>4. Batch Inventory Mode</h3>
-          <p>Multi-scan session queue with bulk warehouse tagging and CSV/JSON export.</p>
-        </div>
-        <div class="shot-card">
-          <img src="screenshots/05-history-vault-screen.png" alt="QRYPT Local Optical Vault" loading="lazy" />
-          <h3>5. Local Optical Vault</h3>
-          <p>Offline Room SQLite history with instant search, 9 category filters &amp; favorites.</p>
-        </div>
-        <div class="shot-card">
-          <img src="screenshots/06-generator-studio-screen.png" alt="QRYPT Generator Studio" loading="lazy" />
-          <h3>6. Optical Generator Studio</h3>
-          <p>13-format barcode &amp; QR matrix creator with custom color presets &amp; HD PNG export.</p>
-        </div>
-        <div class="shot-card">
-          <img src="screenshots/07-settings-screen-dark.png" alt="QRYPT Settings Dark Theme" loading="lazy" />
-          <h3>7. Settings &amp; Engine Controls</h3>
-          <p>Midnight Navy (#070B14) theme, accent wavelengths, duplicate cooldown &amp; privacy vault controls.</p>
-        </div>
-        <div class="shot-card">
-          <img src="screenshots/08-light-theme-preview.png" alt="QRYPT Frosted Daylight Light Theme" loading="lazy" />
-          <h3>8. Frosted Daylight Theme</h3>
-          <p>High-contrast Light Mode with 1-tap header toggle for bright outdoor environments.</p>
+
+        <!-- Verified Specs Strip -->
+        <div class="specs-strip" aria-label="Verified technical specifications">
+          <div class="spec-item">
+            <span class="spec-value">13 Formats</span>
+            <span class="spec-label">2D Matrix &amp; 1D Industrial/Retail Barcodes</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-value">0 Network Calls</span>
+            <span class="spec-label">No <code>INTERNET</code> Permission Declared</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-value">Dual Engine</span>
+            <span class="spec-label">CameraX + Bundled ML Kit &amp; ZXing Core</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-value">1024px–1536px</span>
+            <span class="spec-label">High-Resolution QR &amp; Barcode Studio Export</span>
+          </div>
         </div>
       </div>
     </section>
 
+    <!-- Features & Practical Use Cases Section -->
     <section id="features" class="section">
-      <h2 class="section-title">Engineered for Precision &amp; Privacy</h2>
-      <p class="section-subtitle">
-        Every feature in QRYPT runs 100% locally on your Android device with zero network dependencies.
-      </p>
-      <div class="features-grid">
-        <div class="feature-card">
-          <h3>Dual-Engine Optical Pipeline</h3>
-          <p>Combines Google ML Kit Barcode Scanning for real-time CameraX streams with ZXing Multi-Format Reader (Hybrid + GlobalHistogram binarizers) for static images.</p>
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">Verified Capabilities</span>
+          <h2 class="section-title">Engineered for Speed, Accuracy &amp; Total Privacy</h2>
+          <p class="section-subtitle">
+            Every capability listed below is implemented directly in the Kotlin + Jetpack Compose codebase and tested via automated JUnit &amp; Robolectric verification suites.
+          </p>
         </div>
-        <div class="feature-card">
-          <h3>Offline URL Anti-Phishing</h3>
-          <p>Flags unencrypted HTTP links, Punycode (xn--) homograph spoofing, raw IP addresses, embedded @ credentials, and shorteners before opening any link.</p>
+
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 7V4h3M17 4h3v3M4 17v3h3M17 20h3v-3M7 12h10" />
+              </svg>
+            </div>
+            <h3>Real-Time CameraX + ML Kit Optical Scanner</h3>
+            <p>
+              Hardware-accelerated CameraX <code>ImageAnalysis</code> pipeline with <code>STRATEGY_KEEP_ONLY_LATEST</code> backpressure. Features <strong>Precision Square</strong>, <strong>1D Laser Slit</strong>, and <strong>Full Frame</strong> target modes, pinch-to-zoom, tap-to-focus metering, Torch control, and automatic Y-plane low-light exposure boost (&lt; 45 lux).
+            </p>
+            <ul class="feature-tag-list">
+              <li>CameraX 1.5</li>
+              <li>Bundled ML Kit 17.3</li>
+              <li>Low-Light Boost</li>
+            </ul>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="3" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <path d="m21 15-5-5L5 21" />
+              </svg>
+            </div>
+            <h3>Zero-Permission Photo Library &amp; Self-Test</h3>
+            <p>
+              Decode barcodes from screenshots and saved photos using Android’s system Photo Picker (<code>PickVisualMedia</code>) without requesting storage permissions. Includes multi-angle ZXing rotation/crop recovery (`0°`, `90°`, `180°`, `270°`) and a built-in <strong>Self-Test</strong> suite to verify decoding without a physical barcode.
+            </p>
+            <ul class="feature-tag-list">
+              <li>PickVisualMedia</li>
+              <li>Multi-Angle ZXing</li>
+              <li>Built-In Self-Test</li>
+            </ul>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
+            <h3>Offline Anti-Phishing URL Security Shield</h3>
+            <p>
+              Every scanned URL is inspected on-device by <code>PayloadParser.analyzeUrlSecurity()</code> before opening a browser. Flags unencrypted <code>http://</code> cleartext links, Punycode (<code>xn--</code>) homograph spoofing, raw IPv4/IPv6 hosts, embedded <code>@</code> authority credentials, suspicious TLDs, and link shorteners.
+            </p>
+            <ul class="feature-tag-list">
+              <li>Homograph Detection</li>
+              <li>HTTPS Verification</li>
+              <li>GS1 Checksum</li>
+            </ul>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                <rect x="9" y="3" width="6" height="4" rx="1" />
+                <path d="M9 12h6M9 16h6" />
+              </svg>
+            </div>
+            <h3>High-Speed Batch &amp; Continuous Inventory</h3>
+            <p>
+              Scan dozens of items in rapid succession with configurable duplicate cooldown suppression, live session counters, and bulk inventory/warehouse note tagging. Export complete batch sessions to RFC-4180 <strong>CSV</strong> or structured <strong>JSON</strong> with one tap.
+            </p>
+            <ul class="feature-tag-list">
+              <li>Batch Queue</li>
+              <li>Duplicate Guard</li>
+              <li>CSV &amp; JSON Export</li>
+            </ul>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+                <path d="M14 14h7v7h-7z" />
+              </svg>
+            </div>
+            <h3>Optical QR &amp; 13-Format Generator Studio</h3>
+            <p>
+              Create custom QR codes and 1D/2D barcodes across 10 structured templates (URL, Wi-Fi, vCard 3.0, Retail GTIN, Email, SMS, Phone, Geo, Calendar, Text). Customize error correction (<code>L</code>, <code>M</code>, <code>Q</code>, <code>H</code>), rounded modules, color presets, and export up to <code>1536px</code> PNGs.
+            </p>
+            <ul class="feature-tag-list">
+              <li>13 Symbologies</li>
+              <li>10 Templates</li>
+              <li>HD PNG Share</li>
+            </ul>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+              </svg>
+            </div>
+            <h3>Local Room SQLite Optical Vault</h3>
+            <p>
+              All scanned and generated records are persisted strictly on-device inside <code>prism_scan_vault.db</code>. Features instant full-text search across payloads and notes, 9 category/security filters, favorite bookmarking, and granular vault purge controls.
+            </p>
+            <ul class="feature-tag-list">
+              <li>Room SQLite 2.8</li>
+              <li>9 Category Chips</li>
+              <li>1-Tap Vault Purge</li>
+            </ul>
+          </article>
         </div>
-        <div class="feature-card">
-          <h3>13 Symbologies &amp; GS1 Lookup</h3>
-          <p>Decodes and generates QR, Aztec, Data Matrix, PDF417, EAN-13/8, UPC-A/E, Code 128/39/93, Codabar, and ITF with automatic Modulo-10 checksums and GS1 country lookup.</p>
+
+        <!-- Practical Use Cases -->
+        <div class="use-cases-grid" aria-label="Practical real-world use cases">
+          <div class="use-case-card">
+            <h4>1. Everyday Consumer &amp; Event Access</h4>
+            <p>Join WPA2/WPA3 Wi-Fi networks, import vCard contacts, add calendar events, and dial or message contacts immediately from printed QR codes.</p>
+          </div>
+          <div class="use-case-card">
+            <h4>2. Security-Conscious Link Inspection</h4>
+            <p>Inspect restaurant menus, parking meters, and public posters for Punycode homographs, raw IP links, or unencrypted HTTP redirects before opening them.</p>
+          </div>
+          <div class="use-case-card">
+            <h4>3. Retail &amp; Warehouse Batch Auditing</h4>
+            <p>Use the 1D Laser Slit and Batch Mode to scan EAN-13, UPC-A, Code 128, and ITF carton labels, tag aisle notes, and export RFC-4180 CSV sheets to your ERP.</p>
+          </div>
+          <div class="use-case-card">
+            <h4>4. Print &amp; Digital Asset Studio</h4>
+            <p>Generate high-contrast QR codes, ISBN/EAN retail barcodes with automatic Modulo-10 check digits, and PDF417 badges at up to 1536×1536px resolution.</p>
+          </div>
         </div>
-        <div class="feature-card">
-          <h3>Batch Queue &amp; CSV/JSON Export</h3>
-          <p>Capture items in rapid succession with configurable duplicate cooldowns, bulk-tag inventory notes, and export RFC-4180 CSV or structured JSON files.</p>
+      </div>
+    </section>
+
+    <!-- Genuine Screenshots Gallery -->
+    <section id="screenshots" class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">Genuine Application Renders</span>
+          <h2 class="section-title">Real Jetpack Compose UI Across Dark &amp; Daylight Themes</h2>
+          <p class="section-subtitle">
+            Every screenshot below is rendered directly from the real QRYPT Android application codebase via our automated Robolectric Native-Graphics test suite (<code>./scripts/capture-screenshots.sh</code>). Click any screen to inspect full size.
+          </p>
         </div>
-        <div class="feature-card">
-          <h3>Zero-Permission Photo Picker</h3>
-          <p>Scan barcodes from screenshots and gallery photos using Android's system Photo Picker (PickVisualMedia) without requesting storage permissions.</p>
+
+        <div class="filter-bar" role="toolbar" aria-label="Filter application screenshots">
+          <button type="button" class="filter-btn" data-filter="all" aria-pressed="true">All 8 Screens</button>
+          <button type="button" class="filter-btn" data-filter="scanner" aria-pressed="false">Scanner &amp; Result HUD</button>
+          <button type="button" class="filter-btn" data-filter="workflow" aria-pressed="false">Batch &amp; History Vault</button>
+          <button type="button" class="filter-btn" data-filter="studio" aria-pressed="false">Generator Studio</button>
+          <button type="button" class="filter-btn" data-filter="theme" aria-pressed="false">Settings &amp; Light Theme</button>
         </div>
-        <div class="feature-card" id="privacy">
-          <h3>Zero Internet Permission</h3>
-          <p>QRYPT does not declare android.permission.INTERNET. No camera frames, scan history, or telemetry can ever leave your device.</p>
+
+        <div class="screenshots-grid" id="screenshotsGrid">
+          <article class="shot-card" data-category="scanner">
+            <button type="button" class="shot-img-btn" data-full="screenshots/01-scanner-screen.png" data-caption="1. Live Optical Scanner HUD — Precision Square, 1D Slit, Torch, Low-Light Boost, and Photo Library">
+              <img src="screenshots/01-scanner-screen.png" alt="QRYPT Scanner Screen showing Midnight Navy HUD, optical reticle, and bottom navigation" width="270" height="600" loading="lazy" />
+            </button>
+            <div class="shot-meta">
+              <span class="shot-step">01 / SCANNER</span>
+              <span class="shot-theme-tag">Dark #070B14</span>
+            </div>
+            <h3>Optical Scanner HUD</h3>
+            <p>Precision Square reticle, 1D Laser Slit selector, Torch, Low-Light Boost, Photo Library &amp; Self-Test controls.</p>
+          </article>
+
+          <article class="shot-card" data-category="scanner">
+            <button type="button" class="shot-img-btn" data-full="screenshots/02-scan-result-sheet.png" data-caption="2. Smart Result & Security Shield — Offline URL heuristic check, structured fields, and smart actions">
+              <img src="screenshots/02-scan-result-sheet.png" alt="QRYPT Scan Result Sheet showing verified HTTPS link badge and one-tap smart actions" width="270" height="600" loading="lazy" />
+            </button>
+            <div class="shot-meta">
+              <span class="shot-step">02 / RESULT</span>
+              <span class="shot-theme-tag">Dark #070B14</span>
+            </div>
+            <h3>Smart Result &amp; Security Shield</h3>
+            <p>Offline anti-phishing verification badge, parsed metadata table, favorite toggle, and context-aware actions.</p>
+          </article>
+
+          <article class="shot-card" data-category="scanner">
+            <button type="button" class="shot-img-btn" data-full="screenshots/03-image-scan-and-modes.png" data-caption="3. Continuous & 1D Laser Slit Mode — Dedicated horizontal slit for dense industrial/retail barcodes">
+              <img src="screenshots/03-image-scan-and-modes.png" alt="QRYPT Continuous Scan and 1D Laser Slit Mode viewfinder" width="270" height="600" loading="lazy" />
+            </button>
+            <div class="shot-meta">
+              <span class="shot-step">03 / MODES</span>
+              <span class="shot-theme-tag">Dark #070B14</span>
+            </div>
+            <h3>Continuous &amp; 1D Laser Slit Mode</h3>
+            <p>Horizontal laser slit for tightly packed 1D barcodes plus uninterrupted continuous stream capture.</p>
+          </article>
+
+          <article class="shot-card" data-category="workflow">
+            <button type="button" class="shot-img-btn" data-full="screenshots/04-batch-scanner-screen.png" data-caption="4. Batch Inventory Mode — Multi-scan session queue with bulk tagging and CSV/JSON export">
+              <img src="screenshots/04-batch-scanner-screen.png" alt="QRYPT Batch Scanner screen showing captured inventory items and CSV/JSON export controls" width="270" height="600" loading="lazy" />
+            </button>
+            <div class="shot-meta">
+              <span class="shot-step">04 / BATCH</span>
+              <span class="shot-theme-tag">Dark #070B14</span>
+            </div>
+            <h3>Batch Inventory Mode</h3>
+            <p>Multi-scan session queue with duplicate guard, bulk warehouse note tagging, and one-tap CSV/JSON export.</p>
+          </article>
+
+          <article class="shot-card" data-category="workflow">
+            <button type="button" class="shot-img-btn" data-full="screenshots/05-history-vault-screen.png" data-caption="5. Local Optical Vault — Room SQLite history with instant search and 9 category filter pills">
+              <img src="screenshots/05-history-vault-screen.png" alt="QRYPT Local Optical Vault screen displaying stored records, search bar, and category filter pills" width="270" height="600" loading="lazy" />
+            </button>
+            <div class="shot-meta">
+              <span class="shot-step">05 / VAULT</span>
+              <span class="shot-theme-tag">Dark #070B14</span>
+            </div>
+            <h3>Local Optical Vault</h3>
+            <p>100% offline Room SQLite history with instant search, 9 category filters, favorites, and bulk export.</p>
+          </article>
+
+          <article class="shot-card" data-category="studio">
+            <button type="button" class="shot-img-btn" data-full="screenshots/06-generator-studio-screen.png" data-caption="6. Optical Generator Studio — 13-format barcode & QR matrix creator with custom styling">
+              <img src="screenshots/06-generator-studio-screen.png" alt="QRYPT Optical Generator Studio showing live QR code preview, format selector, and color presets" width="270" height="600" loading="lazy" />
+            </button>
+            <div class="shot-meta">
+              <span class="shot-step">06 / STUDIO</span>
+              <span class="shot-theme-tag">Dark #070B14</span>
+            </div>
+            <h3>Optical Generator Studio</h3>
+            <p>13-format QR &amp; barcode creator with 10 structured payload templates, custom colors, and HD PNG export.</p>
+          </article>
+
+          <article class="shot-card" data-category="theme">
+            <button type="button" class="shot-img-btn" data-full="screenshots/07-settings-screen-dark.png" data-caption="7. Settings & Engine Controls — Developer ArnobRazz • Version 1.0.0, theme controls, and vault management">
+              <img src="screenshots/07-settings-screen-dark.png" alt="QRYPT Settings screen in Dark Mode showing QRYPT identity, Developer ArnobRazz, Version 1.0.0, and appearance options" width="270" height="600" loading="lazy" />
+            </button>
+            <div class="shot-meta">
+              <span class="shot-step">07 / SETTINGS</span>
+              <span class="shot-theme-tag">Dark #070B14</span>
+            </div>
+            <h3>Settings &amp; Engine Controls</h3>
+            <p>Displays QRYPT identity (<code>Developer: Arnobrazz • Version 1.0.0</code>), accent wavelengths, and privacy controls.</p>
+          </article>
+
+          <article class="shot-card" data-category="theme">
+            <button type="button" class="shot-img-btn" data-full="screenshots/08-light-theme-preview.png" data-caption="8. Frosted Daylight Light Theme — High-contrast light theme for bright outdoor environments">
+              <img src="screenshots/08-light-theme-preview.png" alt="QRYPT Frosted Daylight Light Theme preview" width="270" height="600" loading="lazy" />
+            </button>
+            <div class="shot-meta">
+              <span class="shot-step">08 / DAYLIGHT</span>
+              <span class="shot-theme-tag">Light #F4F7FB</span>
+            </div>
+            <h3>Frosted Daylight Light Theme</h3>
+            <p>High-contrast daylight color scheme with a 1-tap header toggle for bright outdoor scanning.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Supported QR & Barcode Formats Matrix -->
+    <section id="formats" class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">13 Symbologies + 12 Structured Schemas</span>
+          <h2 class="section-title">Comprehensive Industrial, Retail &amp; 2D Matrix Support</h2>
+          <p class="section-subtitle">
+            Verified against <code>BarcodeFormatType</code> and <code>PayloadParser.kt</code>. QRYPT both decodes and generates all 13 symbologies locally.
+          </p>
+        </div>
+
+        <div class="table-wrapper">
+          <table aria-label="Supported barcode formats and structured payload parsers">
+            <thead>
+              <tr>
+                <th scope="col">Category</th>
+                <th scope="col">Supported Formats / Schemas</th>
+                <th scope="col">Validation &amp; Smart Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>2D Matrix Formats (4)</strong></td>
+                <td>
+                  <div class="chip-group">
+                    <span class="format-chip">QR_CODE</span>
+                    <span class="format-chip">AZTEC</span>
+                    <span class="format-chip">DATA_MATRIX</span>
+                    <span class="format-chip">PDF417</span>
+                  </div>
+                </td>
+                <td>Full reed-solomon error correction (<code>L</code>, <code>M</code>, <code>Q</code>, <code>H</code> for QR), multi-rotation decoding, and high-density boarding pass / ID support.</td>
+              </tr>
+              <tr>
+                <td><strong>1D Retail GTIN &amp; Bookland (4)</strong></td>
+                <td>
+                  <div class="chip-group">
+                    <span class="format-chip">EAN_13</span>
+                    <span class="format-chip">EAN_8</span>
+                    <span class="format-chip">UPC_A</span>
+                    <span class="format-chip">UPC_E</span>
+                  </div>
+                </td>
+                <td>Automatic <strong>Modulo-10 check-digit computation</strong>, <strong>GS1 Country/Region Prefix Lookup</strong>, and ISBN-13 / ISBN-10 detection.</td>
+              </tr>
+              <tr>
+                <td><strong>1D Industrial &amp; Logistics (5)</strong></td>
+                <td>
+                  <div class="chip-group">
+                    <span class="format-chip">CODE_128</span>
+                    <span class="format-chip">CODE_39</span>
+                    <span class="format-chip">CODE_93</span>
+                    <span class="format-chip">CODABAR</span>
+                    <span class="format-chip">ITF</span>
+                  </div>
+                </td>
+                <td>Dedicated <strong>1D Laser Slit</strong> viewfinder mode, warehouse batch tagging, and automatic even-length digit normalization for ITF.</td>
+              </tr>
+              <tr>
+                <td><strong>Structured Payload Parsers (12)</strong></td>
+                <td>
+                  <div class="chip-group">
+                    <span class="format-chip">URL (HTTP/HTTPS)</span>
+                    <span class="format-chip">WIFI:</span>
+                    <span class="format-chip">VCARD / MECARD</span>
+                    <span class="format-chip">VEVENT Calendar</span>
+                    <span class="format-chip">mailto: / MATMSG:</span>
+                    <span class="format-chip">smsto:</span>
+                    <span class="format-chip">tel:</span>
+                    <span class="format-chip">geo:</span>
+                    <span class="format-chip">ISBN</span>
+                    <span class="format-chip">PRODUCT GTIN</span>
+                    <span class="format-chip">JSON</span>
+                    <span class="format-chip">TEXT</span>
+                  </div>
+                </td>
+                <td>One-tap system intents: Open Verified Link, Copy Wi-Fi Password &amp; Open Wi-Fi Settings, Save Contact, Add Calendar Event, Dial, SMS, Email, Open Maps.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Privacy-First Architecture & Permissions Section -->
+    <section id="privacy" class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">Zero-Trust Local Architecture</span>
+          <h2 class="section-title">Privacy by Engineering, Not Just Policy</h2>
+          <p class="section-subtitle">
+            Verified directly from <code>app/src/main/AndroidManifest.xml</code> and <code>app/build.gradle.kts</code>.
+          </p>
+        </div>
+
+        <div class="split-grid">
+          <div class="panel-card">
+            <h3>
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--safe-emerald)" stroke-width="2.2" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+              Verified Offline Data Handling
+            </h3>
+            <ul class="check-list">
+              <li>
+                <span class="status-dot" aria-hidden="true"></span>
+                <span><strong>No Internet Permission:</strong> QRYPT does not declare <code>android.permission.INTERNET</code>. The Android OS prevents the app from opening network sockets or transmitting data off your device.</span>
+              </li>
+              <li>
+                <span class="status-dot" aria-hidden="true"></span>
+                <span><strong>Bundled On-Device ML Models:</strong> Uses <code>com.google.mlkit:barcode-scanning:17.3.0</code> (bundled model) and <code>com.google.zxing:core:3.5.3</code> so scanning works immediately on first launch in Airplane Mode.</span>
+              </li>
+              <li>
+                <span class="status-dot" aria-hidden="true"></span>
+                <span><strong>Local SQLite &amp; DataStore Sandbox:</strong> History and preferences stay inside your private app storage (<code>prism_scan_vault.db</code>) with 1-tap Vault Purge at any time.</span>
+              </li>
+              <li>
+                <span class="status-dot" aria-hidden="true"></span>
+                <span><strong>Scoped File Exports:</strong> CSV, JSON, and PNG exports use <code>androidx.core.content.FileProvider</code> (<code>android:exported="false"</code>) only when you explicitly tap Share/Export.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="panel-card">
+            <h3>
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent-cyan)" stroke-width="2.2" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              Permissions Explained in Plain Language
+            </h3>
+            <ul class="check-list">
+              <li>
+                <span class="status-dot" aria-hidden="true"></span>
+                <span><strong><code>android.permission.CAMERA</code> (Optional Runtime):</strong> Used strictly to analyze live viewfinder frames in volatile memory. If denied, you can still scan images from your photo library, use the Self-Test suite, browse the Vault, and create codes in Studio.</span>
+              </li>
+              <li>
+                <span class="status-dot" aria-hidden="true"></span>
+                <span><strong><code>android.permission.VIBRATE</code> (Normal Install-Time):</strong> Triggers a subtle haptic pulse when a barcode locks onto the reticle (can be toggled off in Settings).</span>
+              </li>
+              <li>
+                <span class="status-dot" aria-hidden="true"></span>
+                <span><strong>Zero Storage Permissions:</strong> QRYPT uses the system Android Photo Picker (<code>PickVisualMedia</code>) and never requests <code>READ_MEDIA_IMAGES</code> or <code>READ_EXTERNAL_STORAGE</code>.</span>
+              </li>
+              <li>
+                <span class="status-dot" aria-hidden="true"></span>
+                <span><strong>Zero Tracking Permissions:</strong> Never requests Location, Contacts, Microphone, Phone State, SMS, or Bluetooth permissions.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Installation, SHA-256 Verification & Developer Build Section -->
+    <section id="install" class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">Get Started in 60 Seconds</span>
+          <h2 class="section-title">How to Install, Verify &amp; Build QRYPT</h2>
+          <p class="section-subtitle">
+            Download the verified release APK directly from GitHub Releases or compile from source with JDK 17/21 and Gradle.
+          </p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <span class="step-num">1</span>
+            <h3>Download Verified APK</h3>
+            <p>
+              Download <code>QRYPT-v1.0.0-release.apk</code> (12.65 MB) or <code>QRYPT.apk</code> from the official <a href="https://github.com/CodeByArnob/QRYPT/releases/tag/v1.0.0">GitHub Release v1.0.0</a> page on your Android device (Android 7.0 / API 24 or newer).
+            </p>
+            <div style="margin-top: 14px;">
+              <a class="btn btn-primary btn-sm" href="https://github.com/CodeByArnob/QRYPT/releases/download/v1.0.0/QRYPT-v1.0.0-release.apk">
+                Download v1.0.0 APK
+              </a>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <span class="step-num">2</span>
+            <h3>Verify SHA-256 Checksum</h3>
+            <p>
+              Every GitHub release includes <code>SHA256SUMS.txt</code> so you can verify package integrity before installing:
+            </p>
+            <pre class="code-box"><code>sha256sum QRYPT-v1.0.0-release.apk
+# Expected SHA-256:
+# 071bc524d78637517b6ce14f6c471b2421497f79a5cfacfaaf2041bc048b9c23</code></pre>
+          </div>
+
+          <div class="step-card">
+            <span class="step-num">3</span>
+            <h3>Build &amp; Test From Source</h3>
+            <p>
+              Clone the repository and run the unit &amp; Robolectric verification suite or assemble a debug APK locally:
+            </p>
+            <pre class="code-box"><code>git clone https://github.com/CodeByArnob/QRYPT.git
+cd QRYPT
+gradle :app:testDebugUnitTest
+gradle :app:assembleDebug</code></pre>
+          </div>
+        </div>
+
+        <div class="notice-box" role="note" aria-label="Sideloading and Google Play Protect note">
+          <strong>Transparent Note on Direct APK Sideloading &amp; Signing:</strong> Because QRYPT is distributed directly as an independent open-source APK on GitHub Releases rather than through the Google Play Store, Android’s Google Play Protect may display a standard notice: <em>“Play Protect hasn’t seen an app from this developer before.”</em> Tap <strong>More details → Install anyway</strong> to complete installation.
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">Frequently Asked Questions</span>
+          <h2 class="section-title">Everything You Need to Know</h2>
+        </div>
+
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>Does QRYPT require an internet connection to scan or generate barcodes?</summary>
+            <div class="faq-body">
+              No. QRYPT is 100% offline. It does not even request the <code>android.permission.INTERNET</code> permission in its AndroidManifest. Both Google ML Kit Barcode Scanning (bundled model) and ZXing Core run entirely on your device’s processor.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>How can QRYPT scan photos from my gallery without requesting storage permissions?</summary>
+            <div class="faq-body">
+              QRYPT uses Android’s modern system Photo Picker (<code>ActivityResultContracts.PickVisualMedia</code>). When you tap <strong>Photo Library</strong>, the Android OS presents its built-in picker and grants QRYPT temporary read access only to the single image you choose—keeping the rest of your photo library completely private.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>How does the offline URL anti-phishing analyzer work?</summary>
+            <div class="faq-body">
+              Whenever a QR code or barcode contains a link, <code>PayloadParser.analyzeUrlSecurity()</code> inspects the URI structure locally. It flags unencrypted <code>http://</code> protocols, Punycode (<code>xn--</code>) internationalized homograph attacks, raw IPv4/IPv6 hostnames, embedded <code>@</code> authority spoofing, high-risk top-level domains, and URL shorteners before launching any browser intent.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Why is the internal Android package identifier hidden from the user interface?</summary>
+            <div class="faq-body">
+              To keep the interface clean and consumer-friendly, the Settings screen displays only the product identity (<strong>QRYPT — Scan Smarter. Instantly.</strong>), developer (<strong>Arnobrazz</strong>), and version (<strong>1.0.0</strong>). Under the hood, <code>applicationId = "com.arnobrazz.qrypt"</code> remains intact in <code>app/build.gradle.kts</code> for standard Android installation and upgrades.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>What Android versions are supported?</summary>
+            <div class="faq-body">
+              QRYPT supports <strong>Android 7.0 Nougat (API 24)</strong> through <strong>Android 16 (API 36)</strong>, including foldables, tablets, and Android 12+ Material You Dynamic Color themes.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>How can I contribute, report a bug, or disclose a security issue?</summary>
+            <div class="faq-body">
+              Read our <a href="https://github.com/CodeByArnob/QRYPT/blob/main/CONTRIBUTING.md">Contribution Guide</a> and open an issue or pull request on <a href="https://github.com/CodeByArnob/QRYPT/issues">GitHub Issues</a>. For security vulnerabilities, please follow our <a href="https://github.com/CodeByArnob/QRYPT/blob/main/SECURITY.md">Security Policy</a> and email <a href="mailto:arnobrazz.dev@gmail.com">arnobrazz.dev@gmail.com</a>.
+            </div>
+          </details>
         </div>
       </div>
     </section>
   </main>
 
-  <footer>
+  <!-- Lightbox Modal for Screenshot Inspection -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="lightboxCaption">
+    <div class="lightbox-content">
+      <img src="screenshots/01-scanner-screen.png" alt="Expanded QRYPT screenshot preview" id="lightboxImg" />
+      <p id="lightboxCaption" style="font-size: 0.9rem; color: var(--text-secondary);"></p>
+      <button type="button" class="btn btn-secondary btn-sm lightbox-close" id="lightboxClose">Close Preview (Esc)</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
     <div class="container">
-      <p><strong>QRYPT — Scan Smarter. Instantly.</strong> • Developed by <strong>Arnobrazz</strong> (<a href="mailto:arnobrazz.dev@gmail.com">arnobrazz.dev@gmail.com</a>)</p>
-      <p style="margin-top: 6px;">Released under the <a href="https://github.com/CodeByArnob/QRYPT/blob/main/LICENSE">MIT License</a> • <a href="https://github.com/CodeByArnob/QRYPT">GitHub Repository</a> • <a href="https://github.com/CodeByArnob/QRYPT/releases/latest">Latest APK Release</a></p>
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="brand" style="margin-bottom: 12px;">
+            <img src="assets/qrypt-logo.svg" alt="QRYPT Logo" width="36" height="36" />
+            <span class="brand-meta">
+              <span>QRYPT</span>
+              <span class="brand-tagline">Scan Smarter. Instantly.</span>
+            </span>
+          </div>
+          <p style="color: var(--text-secondary); font-size: 0.88rem; max-width: 320px;">
+            Open-source, 100% offline Android QR &amp; 13-format Barcode Scanner, Batch Inventory Engine, and Optical Generator Studio.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#features">Verified Features</a></li>
+            <li><a href="#screenshots">Genuine Screenshots</a></li>
+            <li><a href="#formats">13 Barcode Formats</a></li>
+            <li><a href="#privacy">Privacy &amp; Permissions</a></li>
+            <li><a href="https://github.com/CodeByArnob/QRYPT/releases/tag/v1.0.0">Release v1.0.0 APK</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Documentation</h4>
+          <ul>
+            <li><a href="https://github.com/CodeByArnob/QRYPT/blob/main/README.md">GitHub README</a></li>
+            <li><a href="https://github.com/CodeByArnob/QRYPT/blob/main/CHANGELOG.md">Changelog (v1.0.0)</a></li>
+            <li><a href="https://github.com/CodeByArnob/QRYPT/blob/main/CONTRIBUTING.md">Contributing Guide</a></li>
+            <li><a href="https://github.com/CodeByArnob/QRYPT/blob/main/PRIVACY_POLICY.md">Privacy Policy</a></li>
+            <li><a href="https://github.com/CodeByArnob/QRYPT/blob/main/SECURITY.md">Security Policy</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Developer &amp; Community</h4>
+          <ul>
+            <li><a href="https://github.com/CodeByArnob" target="_blank" rel="noopener noreferrer">ArnobRazz (@CodeByArnob)</a></li>
+            <li><a href="https://github.com/CodeByArnob/QRYPT" target="_blank" rel="noopener noreferrer">Source Repository</a></li>
+            <li><a href="https://github.com/CodeByArnob/QRYPT/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a></li>
+            <li><a href="https://github.com/CodeByArnob/QRYPT/actions" target="_blank" rel="noopener noreferrer">GitHub Actions CI/CD</a></li>
+            <li><a href="mailto:arnobrazz.dev@gmail.com">arnobrazz.dev@gmail.com</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 ArnobRazz. Released under the <a href="https://github.com/CodeByArnob/QRYPT/blob/main/LICENSE">MIT License</a>.</span>
+        <span>Built with Kotlin, Jetpack Compose (Material 3), CameraX, ML Kit &amp; ZXing.</span>
+      </div>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      // Mobile Navigation Toggle
+      var menuToggle = document.getElementById('menuToggle');
+      var primaryNav = document.getElementById('primaryNav');
+      if (menuToggle && primaryNav) {
+        menuToggle.addEventListener('click', function () {
+          var expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+          menuToggle.setAttribute('aria-expanded', String(!expanded));
+          primaryNav.classList.toggle('open', !expanded);
+        });
+      }
+
+      // Screenshot Category Filter
+      var filterButtons = document.querySelectorAll('.filter-btn');
+      var shotCards = document.querySelectorAll('.shot-card');
+      filterButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var filter = btn.getAttribute('data-filter');
+          filterButtons.forEach(function (b) {
+            b.setAttribute('aria-pressed', String(b === btn));
+          });
+          shotCards.forEach(function (card) {
+            var category = card.getAttribute('data-category');
+            if (filter === 'all' || category === filter) {
+              card.removeAttribute('hidden');
+            } else {
+              card.setAttribute('hidden', 'hidden');
+            }
+          });
+        });
+      });
+
+      // Accessible Lightbox Preview
+      var lightbox = document.getElementById('lightbox');
+      var lightboxImg = document.getElementById('lightboxImg');
+      var lightboxCaption = document.getElementById('lightboxCaption');
+      var lightboxClose = document.getElementById('lightboxClose');
+      var lastFocusedElement = null;
+
+      document.querySelectorAll('.shot-img-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          lastFocusedElement = btn;
+          var fullSrc = btn.getAttribute('data-full');
+          var caption = btn.getAttribute('data-caption') || '';
+          lightboxImg.setAttribute('src', fullSrc);
+          lightboxCaption.textContent = caption;
+          lightbox.setAttribute('aria-hidden', 'false');
+          lightboxClose.focus();
+        });
+      });
+
+      function closeLightbox() {
+        lightbox.setAttribute('aria-hidden', 'true');
+        if (lastFocusedElement) {
+          lastFocusedElement.focus();
+        }
+      }
+
+      if (lightboxClose) {
+        lightboxClose.addEventListener('click', closeLightbox);
+      }
+      if (lightbox) {
+        lightbox.addEventListener('click', function (e) {
+          if (e.target === lightbox) closeLightbox();
+        });
+      }
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && lightbox && lightbox.getAttribute('aria-hidden') === 'false') {
+          closeLightbox();
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

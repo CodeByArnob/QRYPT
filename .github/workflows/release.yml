@@ -42,18 +42,19 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android SDK Platform 36 & Build Tools
+      - name: Accept Android SDK Licenses
         run: |
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+          SDKMANAGER="${ANDROID_HOME:-/usr/local/lib/android/sdk}/cmdline-tools/latest/bin/sdkmanager"
+          if [ -x "$SDKMANAGER" ]; then
+            yes | "$SDKMANAGER" --licenses > /dev/null || true
+          else
+            yes | sdkmanager --licenses > /dev/null || true
+          fi
 
-      - name: Set up Gradle
+      - name: Set up Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '9.0.0'
+          gradle-version: '9.3.1'
 
       - name: Restore Debug Keystore
         run: |
@@ -62,7 +63,7 @@ jobs:
           fi
 
       - name: Run Unit & Robolectric Verification Suite
-        run: gradle :app:testDebugUnitTest --stacktrace
+        run: gradle :app:testDebugUnitTest --no-configuration-cache --stacktrace
 
       - name: Prepare Release Signing Keystore
         id: signing
@@ -104,10 +105,11 @@ jobs:
           DEBUG_APK="QRYPT-v${VERSION}-debug.apk"
 
           cp app/build/outputs/apk/release/app-release.apk "$RELEASE_APK"
+          cp app/build/outputs/apk/release/app-release.apk "QRYPT.apk"
           cp app/build/outputs/apk/debug/app-debug.apk "$DEBUG_APK"
 
-          /opt/android/sdk/build-tools/36.0.0/apksigner verify --verbose "$RELEASE_APK" || apksigner verify --verbose "$RELEASE_APK" || true
-          sha256sum "$RELEASE_APK" "$DEBUG_APK" > SHA256SUMS.txt
+          rm -f "${GITHUB_WORKSPACE}/my-upload-key.jks"
+          sha256sum "QRYPT.apk" "$RELEASE_APK" "$DEBUG_APK" > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
       - name: Generate Release Notes
@@ -117,7 +119,7 @@ jobs:
           cat <<EOF > RELEASE_NOTES.md
           ## QRYPT ${TAG} — Scan Smarter. Instantly.
 
-          Production Android release of **QRYPT QR & Barcode Scanner** (\`com.arnobrazz.qrypt\`) by **Arnobrazz**.
+          Production Android release of **QRYPT — QR & Barcode Scanner** (\`com.arnobrazz.qrypt\`) by **ArnobRazz** (\`© 2026 ArnobRazz\`).
 
           ### Highlights & Capabilities
           - **Dual-Engine Optical Scanner**: Real-time CameraX + Google ML Kit Barcode Scanning & ZXing Multi-Format Reader supporting all **13 major 1D & 2D symbologies** (\`QR Code\`, \`Aztec\`, \`Data Matrix\`, \`PDF417\`, \`EAN-13\`, \`EAN-8\`, \`UPC-A\`, \`UPC-E\`, \`Code 128\`, \`Code 39\`, \`Code 93\`, \`Codabar\`, \`ITF\`).
@@ -135,7 +137,7 @@ jobs:
           \`\`\`
 
           ### Installation Instructions
-          1. Download \`QRYPT-v${VERSION}-release.apk\` from the **Assets** section below.
+          1. Download \`QRYPT-v${VERSION}-release.apk\` (or \`QRYPT.apk\`) from the **Assets** section below.
           2. Open the downloaded APK on your Android device (Android 7.0 / API 24 or newer).
           3. If Google Play Protect displays *"Play Protect hasn't seen an app from this developer before"*, tap **More details → Install anyway** (standard Android notice for direct GitHub APK sideloads not distributed through Google Play).
           EOF
@@ -144,11 +146,12 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
-          name: "QRYPT ${{ steps.meta.outputs.tag }}"
+          name: "QRYPT ${{ steps.meta.outputs.tag }} — Scan Smarter. Instantly."
           body_path: RELEASE_NOTES.md
           draft: false
           prerelease: false
           files: |
+            QRYPT.apk
             QRYPT-v${{ steps.meta.outputs.version }}-release.apk
             QRYPT-v${{ steps.meta.outputs.version }}-debug.apk
             SHA256SUMS.txt
