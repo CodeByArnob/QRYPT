@@ -28,9 +28,17 @@ import com.example.data.local.PrismScanDatabase
 import com.example.data.local.ScanRecordEntity
 import com.example.data.preferences.AppThemeMode
 import com.example.data.preferences.SettingsRepository
+import com.example.data.remote.OpenFoodFactsService
+import com.example.data.remote.ProductLookupRemoteDataSource
+import com.example.data.remote.RemoteLookupResult
+import com.example.data.repository.NetworkConnectivityChecker
+import com.example.data.repository.ProductLookupRepository
 import com.example.data.repository.ScanRepository
 import com.example.domain.model.BarcodeFormatType
 import com.example.domain.model.ParsedPayloadType
+import com.example.domain.model.ProductInfo
+import com.example.domain.model.ProductLookupState
+import com.example.domain.model.ProductNutritionInfo
 import com.example.domain.model.QrCustomizationConfig
 import com.example.domain.model.SecurityRiskLevel
 import com.example.engine.BarcodeGeneratorEngine
@@ -211,6 +219,213 @@ class ExampleRobolectricTest {
     }
 
     @Test
+    fun `OpenFoodFactsService parses JSON and ProductLookupRepository handles caching, not found, offline, invalid barcode, and timeout`() = runBlocking {
+        val sampleSuccessJson = """
+            {
+              "status": "success",
+              "product": {
+                "product_name": "Nutella Hazelnut Spread",
+                "brands": "Ferrero",
+                "quantity": "400 g",
+                "categories": "Spreads, Sweet spreads, Hazelnut spreads",
+                "ingredients_text": "Sugar, palm oil, hazelnuts 13%, skimmed milk powder 8.7%, fat-reduced cocoa 7.4%",
+                "image_front_url": "https://images.openfoodfacts.org/images/products/301/762/042/2003/front_en.jpg",
+                "nutriscore_grade": "e",
+                "nova_group": 4,
+                "origins": "France",
+                "nutriments": {
+                  "energy-kcal_100g": 539,
+                  "fat_100g": 30.9,
+                  "sugars_100g": 56.3,
+                  "proteins_100g": 6.3,
+                  "salt_100g": 0.107
+                }
+              }
+            }
+        """.trimIndent()
+
+        val parsedSuccess = OpenFoodFactsService.parseOpenFoodFactsResponse(
+            jsonString = sampleSuccessJson,
+            barcode = "3017620422003",
+            formatName = "EAN-13"
+        )
+        assertTrue(parsedSuccess is RemoteLookupResult.Found)
+        val parsedProduct = (parsedSuccess as RemoteLookupResult.Found).product
+        assertEquals("Nutella Hazelnut Spread", parsedProduct.productName)
+        assertEquals("Ferrero", parsedProduct.brand)
+        assertEquals("400 g", parsedProduct.quantity)
+        assertEquals("E", parsedProduct.nutrition.nutriscoreGrade)
+        assertEquals(4, parsedProduct.nutrition.novaGroup)
+        assertEquals(539.0, parsedProduct.nutrition.energyKcal100g ?: 0.0, 0.01)
+
+        val notFoundJson = """{"status": "failure", "status_verbose": "product not found"}"""
+        val parsedNotFound = OpenFoodFactsService.parseOpenFoodFactsResponse(
+            jsonString = notFoundJson,
+            barcode = "0000000000000",
+            formatName = "EAN-13"
+        )
+        assertTrue(parsedNotFound is RemoteLookupResult.NotFound)
+
+        val parsedMalformed = OpenFoodFactsService.parseOpenFoodFactsResponse(
+            jsonString = "not-valid-json{{{",
+            barcode = "3017620422003",
+            formatName = "EAN-13"
+        )
+        assertTrue(parsedMalformed is RemoteLookupResult.NetworkError)
+
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val db = PrismScanDatabase.createInMemory(context)
+        var isOnline = true
+        var remoteMode = "SUCCESS"
+
+        val fakeRemote = object : ProductLookupRemoteDataSource {
+            override suspend fun fetchProductByBarcode(
+                barcode: String,
+                formatName: String
+            ): RemoteLookupResult {
+                return when (remoteMode) {
+                    "SUCCESS" -> RemoteLookupResult.Found(parsedProduct.copy(barcode = barcode, formatName = formatName))
+                    "NOT_FOUND" -> RemoteLookupResult.NotFound(barcode)
+                    else -> RemoteLookupResult.NetworkError(
+                        message = "Request timed out while contacting the product database.",
+                        isTimeout = true
+                    )
+                }
+            }
+        }
+
+        val connectivityChecker = NetworkConnectivityChecker { isOnline }
+        val repo = ProductLookupRepository(
+            productCacheDao = db.productCacheDao(),
+            remoteDataSource = fakeRemote,
+            connectivityChecker = connectivityChecker
+        )
+
+        // 1. Invalid barcode input
+        val invalidState = repo.lookupProduct("12345", BarcodeFormatType.EAN_13)
+        assertTrue(invalidState is ProductLookupState.InvalidBarcode)
+
+        // 2. Offline product lookup (before cache)
+        isOnline = false
+        val offlineState = repo.lookupProduct("3017620422003", BarcodeFormatType.EAN_13)
+        assertTrue(offlineState is ProductLookupState.Offline)
+
+        // 3. Successful product lookup and Room caching
+        isOnline = true
+        remoteMode = "SUCCESS"
+        val successState = repo.lookupProduct("3017620422003", BarcodeFormatType.EAN_13)
+        assertTrue(successState is ProductLookupState.Success)
+        assertEquals("Nutella Hazelnut Spread", (successState as ProductLookupState.Success).product.productName)
+
+        // 4. Cached lookup succeeds even when device goes offline
+        isOnline = false
+        val cachedOfflineState = repo.lookupProduct("3017620422003", BarcodeFormatType.EAN_13)
+        assertTrue(cachedOfflineState is ProductLookupState.Success)
+        assertTrue((cachedOfflineState as ProductLookupState.Success).product.isFromCache)
+
+        // 5. Product not found response
+        isOnline = true
+        remoteMode = "NOT_FOUND"
+        val notFoundState = repo.lookupProduct("5901234123457", BarcodeFormatType.EAN_13)
+        assertTrue(notFoundState is ProductLookupState.NotFound)
+
+        // 6. Network timeout / error handling
+        remoteMode = "TIMEOUT"
+        val errorState = repo.lookupProduct("036000291452", BarcodeFormatType.UPC_A)
+        assertTrue(errorState is ProductLookupState.Error)
+
+        db.close()
+    }
+
+    @Test
+    fun `ScanResultSheet displays Open Link with confirmation dialog and Search Online`() {
+        val urlEntity = ScanRecordEntity(
+            id = 10L,
+            rawValue = "https://github.com/CodeByArnob/QRYPT",
+            primaryTitle = "github.com",
+            subtitle = "HTTPS | Verified Safe Syntax",
+            formatName = BarcodeFormatType.QR_CODE.name,
+            payloadTypeName = ParsedPayloadType.URL.name,
+            securityRiskName = SecurityRiskLevel.SAFE.name
+        )
+
+        composeTestRule.setContent {
+            PrismScanTheme(themeMode = AppThemeMode.DARK) {
+                ScanResultSheetContent(
+                    record = urlEntity,
+                    previewBitmap = null
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        // Verify Open Link button is visible and opens confirmation dialog before external navigation
+        composeTestRule.onNodeWithTag("sheet_open_url_button").assertExists()
+        composeTestRule.onNodeWithText("Open Link").assertExists()
+        composeTestRule.onNodeWithTag("sheet_search_online_button").assertExists()
+        composeTestRule.onNodeWithTag("sheet_open_url_button").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("external_action_confirm_dialog").assertExists()
+        composeTestRule.onNodeWithTag("cancel_external_action_button").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun `ScanResultSheet displays View Product button and opens full ProductDetailsModalDialog`() {
+        val productEntity = ScanRecordEntity(
+            id = 11L,
+            rawValue = "3017620422003",
+            primaryTitle = "Nutella Hazelnut Spread",
+            subtitle = "Ferrero | 400 g | EAN-13",
+            formatName = BarcodeFormatType.EAN_13.name,
+            payloadTypeName = ParsedPayloadType.PRODUCT.name,
+            securityRiskName = SecurityRiskLevel.SAFE.name
+        )
+        val sampleProduct = ProductInfo(
+            barcode = "3017620422003",
+            formatName = "EAN-13",
+            productName = "Nutella Hazelnut Spread",
+            brand = "Ferrero",
+            categories = "Hazelnut spreads",
+            quantity = "400 g",
+            ingredientsText = "Sugar, palm oil, hazelnuts 13%, skimmed milk powder",
+            imageUrl = null,
+            nutrition = ProductNutritionInfo(
+                nutriscoreGrade = "E",
+                novaGroup = 4,
+                energyKcal100g = 539.0,
+                fat100g = 30.9,
+                sugars100g = 56.3,
+                proteins100g = 6.3,
+                salt100g = 0.11
+            ),
+            origins = "France",
+            sourceUrl = "https://world.openfoodfacts.org/product/3017620422003"
+        )
+
+        composeTestRule.setContent {
+            PrismScanTheme(themeMode = AppThemeMode.DARK) {
+                ScanResultSheetContent(
+                    record = productEntity,
+                    previewBitmap = null,
+                    productLookupState = ProductLookupState.Success(sampleProduct)
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("product_lookup_success_card").assertExists()
+        composeTestRule.onNodeWithTag("sheet_view_product_button").assertExists()
+        composeTestRule.onNodeWithTag("sheet_view_product_button").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("product_details_dialog").assertExists()
+        composeTestRule.onNodeWithTag("close_product_details_dialog_button").assertExists()
+        composeTestRule.onNodeWithTag("close_product_details_dialog_button").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
     fun `render and capture genuine QRYPT application screenshots across all screens`() = runBlocking {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val db = PrismScanDatabase.createInMemory(context)
@@ -232,14 +447,14 @@ class ExampleRobolectricTest {
             duplicatePreventionEnabled = false
         )
 
-        scanRepo.recordScan(
-            rawValue = "8001234567893",
+        val batchProduct = scanRepo.recordScan(
+            rawValue = "3017620422003",
             format = BarcodeFormatType.EAN_13,
             isGenerated = false,
             batchSessionId = activeBatchId,
             customNotes = "Warehouse Batch #A4",
             duplicatePreventionEnabled = false
-        )
+        )!!
 
         val wifiRecord = scanRepo.recordScan(
             rawValue = "WIFI:T:WPA;S:QRYPT-Optics-5G;P:Qrypt#2026!Secure;H:false;;",
@@ -283,9 +498,12 @@ class ExampleRobolectricTest {
         composeTestRule.onNodeWithTag("region_mode_PRECISION_SQUARE").performClick()
         composeTestRule.waitForIdle()
 
-        // 3. Batch Scanner Screen
+        // 3. Batch Scanner Screen + verify batch item result actions exist
         composeTestRule.onNodeWithTag("nav_tab_batch").performClick()
         composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("batch_item_action_${batchProduct.id}").assertExists()
+        composeTestRule.onNodeWithTag("batch_item_copy_${batchProduct.id}").assertExists()
+        composeTestRule.onNodeWithTag("batch_item_share_${batchProduct.id}").assertExists()
         saveViewScreenshot(hostView, "04-batch-scanner-screen.png")
 
         // 4. Optical Generator Studio Screen
@@ -298,10 +516,10 @@ class ExampleRobolectricTest {
         composeTestRule.waitForIdle()
         saveViewScreenshot(hostView, "05-history-vault-screen.png")
 
-        // 6. Settings Screen (Dark Theme) - verify package name is NOT displayed
+        // 6. Settings Screen (Dark Theme) - verify package name is NOT displayed and version is 1.1.0
         composeTestRule.onNodeWithTag("nav_tab_settings").performClick()
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Developer: Arnobrazz • Version 1.0.0").assertExists()
+        composeTestRule.onNodeWithText("Developer: Arnobrazz | Version 1.1.0").assertExists()
         saveViewScreenshot(hostView, "07-settings-screen-dark.png")
 
         // 7. Light Theme Preview
@@ -318,7 +536,7 @@ class ExampleRobolectricTest {
             id = 42L,
             rawValue = "https://github.com/CodeByArnob/QRYPT",
             primaryTitle = "github.com",
-            subtitle = "HTTPS • Verified Safe Syntax",
+            subtitle = "HTTPS | Verified Safe Syntax",
             formatName = BarcodeFormatType.QR_CODE.name,
             payloadTypeName = ParsedPayloadType.URL.name,
             securityRiskName = SecurityRiskLevel.SAFE.name,

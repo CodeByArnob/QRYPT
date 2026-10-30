@@ -43,6 +43,7 @@ data class UserScanSettings(
     val duplicateCooldownSeconds: Int = 3,
     val autoCopyToClipboard: Boolean = false,
     val autoOpenSafeUrls: Boolean = false,
+    val automaticProductLookup: Boolean = true,
     val lowLightAutoBoost: Boolean = true,
     val defaultScanRegion: ScanRegionMode = ScanRegionMode.PRECISION_SQUARE,
     val continuousScanMode: Boolean = false
@@ -60,6 +61,7 @@ class SettingsRepository(private val context: Context) {
         val DUPLICATE_COOLDOWN_SEC = intPreferencesKey("duplicate_cooldown_sec")
         val AUTO_COPY = booleanPreferencesKey("auto_copy")
         val AUTO_OPEN_SAFE_URL = booleanPreferencesKey("auto_open_safe_url")
+        val AUTO_PRODUCT_LOOKUP = booleanPreferencesKey("auto_product_lookup")
         val LOW_LIGHT_AUTO_BOOST = booleanPreferencesKey("low_light_auto_boost")
         val DEFAULT_SCAN_REGION = stringPreferencesKey("default_scan_region")
         val CONTINUOUS_SCAN_MODE = booleanPreferencesKey("continuous_scan_mode")
@@ -80,6 +82,7 @@ class SettingsRepository(private val context: Context) {
             duplicateCooldownSeconds = prefs[Keys.DUPLICATE_COOLDOWN_SEC] ?: 3,
             autoCopyToClipboard = prefs[Keys.AUTO_COPY] ?: false,
             autoOpenSafeUrls = prefs[Keys.AUTO_OPEN_SAFE_URL] ?: false,
+            automaticProductLookup = prefs[Keys.AUTO_PRODUCT_LOOKUP] ?: true,
             lowLightAutoBoost = prefs[Keys.LOW_LIGHT_AUTO_BOOST] ?: true,
             defaultScanRegion = prefs[Keys.DEFAULT_SCAN_REGION]?.let { name ->
                 ScanRegionMode.entries.firstOrNull { it.name == name }
@@ -122,6 +125,10 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setAutoOpenSafeUrls(enabled: Boolean) {
         context.prismDataStore.edit { it[Keys.AUTO_OPEN_SAFE_URL] = enabled }
+    }
+
+    suspend fun setAutomaticProductLookup(enabled: Boolean) {
+        context.prismDataStore.edit { it[Keys.AUTO_PRODUCT_LOOKUP] = enabled }
     }
 
     suspend fun setLowLightAutoBoost(enabled: Boolean) {

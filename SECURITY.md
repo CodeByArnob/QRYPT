@@ -4,20 +4,23 @@
 
 The following versions of **QRYPT** currently receive security updates and maintenance:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
+| Version | Supported |
+| :--- | :--- |
+| 1.1.x | Yes |
+| 1.0.x | Yes |
 
 ---
 
 ## Security Architecture
 
-QRYPT is engineered with a strict **offline-first, zero-trust payload inspection** model:
+QRYPT is engineered with a strict **zero-trust payload inspection** model:
 
-1. **No Network Attack Surface**: QRYPT does not declare `android.permission.INTERNET` in `AndroidManifest.xml`. No scanned payloads, camera frames, or local database records can ever be transmitted over the network by the application.
-2. **Offline Anti-Phishing URL Heuristics**: Every decoded URL is analyzed locally by `PayloadParser.analyzeUrlSecurity()` before any browser intent is launched. Links exhibiting unencrypted `http://`, Punycode (`xn--`) homograph characters, embedded `@` authority credentials, raw IPv4/IPv6 addresses, high-risk TLDs, or link shorteners trigger a prominent warning dialog requiring explicit user confirmation.
-3. **Scoped File Sharing**: Exported CSV, JSON, and PNG files are shared exclusively via `androidx.core.content.FileProvider` (`android:exported="false"`) using temporary cache URIs with `FLAG_GRANT_READ_URI_PERMISSION`.
-4. **Zero Broad Storage Permissions**: Image scanning uses the system-mediated Android Photo Picker (`ActivityResultContracts.PickVisualMedia`), preventing broad filesystem read access.
+1. **Mandatory User Confirmation for External Links**: QRYPT never automatically opens external links after scanning. Every external action (`Open Link`, `Call`, `Send Email`, `Send Message`, `View Location`, `Add Contact`) requires explicit user interaction and confirmation.
+2. **Strict URI Scheme Allowlisting**: Only validated `http://` and `https://` URLs with valid hostnames can be opened in an external browser. Unsafe URI schemes (`javascript:`, `data:`, `file:`, `vbscript:`, `intent:`, `content:`, `about:`, `blob:`, `jar:`) are blocked by both `PayloadParser` and `ActionIntentHelper`.
+3. **On-Device Anti-Phishing URL Heuristics**: Every decoded URL is analyzed locally by `PayloadParser.analyzeUrlSecurity()` before any browser intent is launched. Links exhibiting unencrypted `http://`, Punycode (`xn--`) homograph characters, embedded `@` authority credentials, raw IPv4/IPv6 addresses, high-risk TLDs, or link shorteners trigger a prominent warning dialog.
+4. **Scoped HTTPS Product Lookup**: When a retail GTIN barcode (`EAN-13`, `EAN-8`, `UPC-A`, `UPC-E`, `ISBN`) is scanned, only the validated numeric barcode digits are sent over HTTPS to `https://world.openfoodfacts.org/api/v3/product/{barcode}.json`. Camera images, gallery photos, QR code payloads, and scan history are never transmitted.
+5. **Scoped File Sharing**: Exported CSV, JSON, and PNG files are shared exclusively via `androidx.core.content.FileProvider` (`android:exported="false"`) using temporary cache URIs with `FLAG_GRANT_READ_URI_PERMISSION`.
+6. **Zero Broad Storage Permissions**: Image scanning uses the system-mediated Android Photo Picker (`ActivityResultContracts.PickVisualMedia`), preventing broad filesystem read access.
 
 ---
 

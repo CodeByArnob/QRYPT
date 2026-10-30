@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Version tag to publish (e.g., v1.0.0)'
+        description: 'Version tag to publish (e.g., v1.1.0)'
         required: false
-        default: 'v1.0.0'
+        default: 'v1.1.0'
 
 permissions:
   contents: write
@@ -119,19 +119,19 @@ jobs:
           cat <<EOF > RELEASE_NOTES.md
           ## QRYPT ${TAG}: Scan Smarter. Instantly.
 
-          Production Android release of **QRYPT QR & Barcode Scanner** (\`com.arnobrazz.qrypt\`) by **ArnobRazz** (\`© 2026 ArnobRazz\`).
+          Production Android release of **QRYPT QR & Barcode Scanner** (\`com.arnobrazz.qrypt\`) by **ArnobRazz** (\`Copyright 2026 ArnobRazz\`).
 
-          ### Highlights & Capabilities
-          - **Dual-Engine Optical Scanner**: Real-time CameraX + Google ML Kit Barcode Scanning & ZXing Multi-Format Reader supporting all **13 major 1D & 2D symbologies** (\`QR Code\`, \`Aztec\`, \`Data Matrix\`, \`PDF417\`, \`EAN-13\`, \`EAN-8\`, \`UPC-A\`, \`UPC-E\`, \`Code 128\`, \`Code 39\`, \`Code 93\`, \`Codabar\`, \`ITF\`).
-          - **Offline Anti-Phishing URL Heuristics**: Local verification of HTTPS encryption, Punycode (\`xn--\`) homograph spoofing, raw IP hosts, embedded \`@\` credentials, and URL shorteners.
-          - **Zero-Permission Photo Library Scanning**: Scan static images directly via the Android Photo Picker (\`PickVisualMedia\`).
-          - **Batch & Continuous Mode**: High-speed multi-barcode capture with session tagging and RFC-4180 **CSV** & **JSON** export.
-          - **Optical Generator Studio**: Create custom QR & 1D/2D barcodes across 10 structured payload templates with high-resolution PNG export.
-          - **100% Offline Privacy**: Zero \`INTERNET\` permission, zero analytics, zero cloud tracking. All records remain strictly in local SQLite (\`prism_scan_vault.db\`).
+          ### Release Highlights
+          1. **Smart Scan Result Actions**: Every decoded QR code or barcode displays an interactive result sheet with context-aware actions including **Open Link**, **View Product**, **Call**, **Send Email**, **Send Message**, **View Location**, **Add Contact**, **Copy**, **Share**, and **Search Online**.
+          2. **Safe External Link Verification**: External links never open automatically without user interaction. A security confirmation dialog displays the target URL and host before launching any external browser, and unsafe URI schemes (\`javascript:\`, \`data:\`, \`file:\`, \`intent:\`, \`vbscript:\`) are strictly rejected.
+          3. **Product Identification from Barcodes**: Scanning retail product barcodes (\`EAN-13\`, \`EAN-8\`, \`UPC-A\`, \`UPC-E\`, \`ISBN\`) automatically queries the Open Food Facts v3 HTTPS API on a background coroutine and caches results locally in Room SQLite (\`product_cache\`). Displays product name, brand, image, package quantity, categories, ingredients, Nutri-Score, NOVA group, and nutrition facts per 100g with a dedicated **View Product** modal and **Open Product Page** action.
+          4. **Dual-Engine Optical Scanner**: Real-time CameraX + Google ML Kit Barcode Scanning & ZXing Multi-Format Reader supporting all 13 major 1D and 2D symbologies.
+          5. **Batch & Continuous Mode**: High-speed multi-barcode capture with inline result actions, session tagging, and RFC-4180 CSV and JSON export.
+          6. **Optical Generator Studio**: Create custom QR and 1D/2D barcodes across 10 structured payload templates with high-resolution PNG export.
 
           ### APK Signing & Verification
-          - **Signing Status**: ${{ steps.signing.outputs.signing_mode }}
-          - **SHA-256 Checksums**:
+          1. **Signing Status**: ${{ steps.signing.outputs.signing_mode }}
+          2. **SHA-256 Checksums**:
           \`\`\`text
           $(cat SHA256SUMS.txt)
           \`\`\`
@@ -139,14 +139,14 @@ jobs:
           ### Installation Instructions
           1. Download \`QRYPT-v${VERSION}-release.apk\` (or \`QRYPT.apk\`) from the **Assets** section below.
           2. Open the downloaded APK on your Android device (Android 7.0 / API 24 or newer).
-          3. If Google Play Protect displays *"Play Protect hasn't seen an app from this developer before"*, tap **More details → Install anyway** (standard Android notice for direct GitHub APK sideloads not distributed through Google Play).
+          3. If Google Play Protect displays *"Play Protect hasn't seen an app from this developer before"*, tap **More details** and then **Install anyway** (standard Android notice for direct GitHub APK sideloads not distributed through Google Play).
           EOF
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
-          name: "QRYPT ${{ steps.meta.outputs.tag }} • Scan Smarter. Instantly."
+          name: "QRYPT ${{ steps.meta.outputs.tag }} | Scan Smarter. Instantly."
           body_path: RELEASE_NOTES.md
           draft: false
           prerelease: false

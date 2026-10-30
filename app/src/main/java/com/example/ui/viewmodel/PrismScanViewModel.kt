@@ -7,26 +7,30 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.data.local.PrismScanDatabase
 import com.example.data.local.ScanRecordEntity
 import com.example.data.preferences.AccentColorPreset
 import com.example.data.preferences.AppThemeMode
 import com.example.data.preferences.SettingsRepository
 import com.example.data.preferences.UserScanSettings
+import com.example.data.repository.AndroidNetworkConnectivityChecker
+import com.example.data.repository.ProductLookupRepository
 import com.example.data.repository.ScanRepository
 import com.example.domain.model.BarcodeFormatType
+import com.example.domain.model.BarcodeValidator
 import com.example.domain.model.DetectedBarcodeFrame
 import com.example.domain.model.ParsedPayloadType
-import com.example.domain.model.QrCustomizationConfig
+import com.example.domain.model.ProductLookupState
 import com.example.domain.model.ScanRegionMode
 import com.example.domain.model.SecurityRiskLevel
 import com.example.domain.parser.PayloadParser
 import com.example.engine.BarcodeGeneratorEngine
 import com.example.engine.BarcodeScannerEngine
 import com.example.engine.FeedbackController
-import com.example.engine.GenerationResult
 import com.example.engine.SampleTestBarcode
 import com.example.util.ActionIntentHelper
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -69,7 +73,11 @@ class PrismScanViewModel(
     private val appContext: Context,
     private val scanRepository: ScanRepository,
     private val settingsRepository: SettingsRepository,
-    private val feedbackController: FeedbackController
+    private val feedbackController: FeedbackController,
+    private val productLookupRepository: ProductLookupRepository = ProductLookupRepository(
+        productCacheDao = PrismScanDatabase.getInstance(appContext).productCacheDao(),
+        connectivityChecker = AndroidNetworkConnectivityChecker(appContext)
+    )
 ) : ViewModel() {
 
     private val _settings = MutableStateFlow(UserScanSettings())
@@ -126,6 +134,16 @@ class PrismScanViewModel(
     // Currently inspected scan result in bottom sheet
     private val _inspectedRecord = MutableStateFlow<ScanRecordEntity?>(null)
     val inspectedRecord: StateFlow<ScanRecordEntity?> = _inspectedRecord.asStateFlow()
+
+    // Latest scanned record for quick access banner on ScannerScreen
+    private val _latestScannedRecord = MutableStateFlow<ScanRecordEntity?>(null)
+    val latestScannedRecord: StateFlow<ScanRecordEntity?> = _latestScannedRecord.asStateFlow()
+
+    // Product identification lookup state for the currently inspected record
+    private val _productLookupState = MutableStateFlow<ProductLookupState>(ProductLookupState.Idle)
+    val productLookupState: StateFlow<ProductLookupState> = _productLookupState.asStateFlow()
+
+    private var activeProductLookupJob: Job? = null
 
     // Batch Scan Session State
     private val _activeBatchSessionId = MutableStateFlow(UUID.randomUUID().toString().take(8).uppercase(Locale.US))
@@ -200,6 +218,90 @@ class PrismScanViewModel(
 
     fun inspectRecord(record: ScanRecordEntity?) {
         _inspectedRecord.value = record
+        activeProductLookupJob?.cancel()
+        if (record == null) {
+            _productLookupState.value = ProductLookupState.Idle
+            return
+        }
+        val isProductCandidate = BarcodeValidator.isProductBarcodeCandidate(
+            rawValue = record.rawValue,
+            format = record.format,
+            payloadType = record.payloadType
+        )
+        if (isProductCandidate && settings.value.automaticProductLookup) {
+            lookupProductForRecord(record, forceRefresh = false)
+        } else {
+            _productLookupState.value = ProductLookupState.Idle
+        }
+    }
+
+    fun lookupProductForRecord(record: ScanRecordEntity, forceRefresh: Boolean = false) {
+        activeProductLookupJob?.cancel()
+        activeProductLookupJob = viewModelScope.launch {
+            _productLookupState.value = ProductLookupState.Loading(
+                barcode = record.rawValue.trim(),
+                formatDisplayName = record.format.displayName
+            )
+            val resultState = productLookupRepository.lookupProduct(
+                rawBarcode = record.rawValue,
+                format = record.format,
+                forceRefresh = forceRefresh
+            )
+            _productLookupState.value = resultState
+
+            if (resultState is ProductLookupState.Success) {
+                val product = resultState.product
+                val enrichedSubtitle = listOfNotNull(
+                    product.brand.takeIf { it.isNotBlank() },
+                    product.quantity.takeIf { it.isNotBlank() },
+                    record.format.displayName
+                ).joinToString(" | ").ifEmpty { record.subtitle }
+
+                scanRepository.updateTitleAndSubtitle(
+                    id = record.id,
+                    title = product.productName,
+                    subtitle = enrichedSubtitle
+                )
+                if (_inspectedRecord.value?.id == record.id) {
+                    _inspectedRecord.value = _inspectedRecord.value?.copy(
+                        primaryTitle = product.productName,
+                        subtitle = enrichedSubtitle
+                    )
+                }
+                if (_latestScannedRecord.value?.id == record.id) {
+                    _latestScannedRecord.value = _latestScannedRecord.value?.copy(
+                        primaryTitle = product.productName,
+                        subtitle = enrichedSubtitle
+                    )
+                }
+            }
+        }
+    }
+
+    private fun enrichBatchProductInBackground(record: ScanRecordEntity) {
+        if (!settings.value.automaticProductLookup) return
+        val isProductCandidate = BarcodeValidator.isProductBarcodeCandidate(
+            rawValue = record.rawValue,
+            format = record.format,
+            payloadType = record.payloadType
+        )
+        if (!isProductCandidate) return
+        viewModelScope.launch {
+            val result = productLookupRepository.lookupProduct(
+                rawBarcode = record.rawValue,
+                format = record.format,
+                forceRefresh = false
+            )
+            if (result is ProductLookupState.Success) {
+                val product = result.product
+                val enrichedSubtitle = listOfNotNull(
+                    product.brand.takeIf { it.isNotBlank() },
+                    product.quantity.takeIf { it.isNotBlank() },
+                    record.format.displayName
+                ).joinToString(" | ").ifEmpty { record.subtitle }
+                scanRepository.updateTitleAndSubtitle(record.id, product.productName, enrichedSubtitle)
+            }
+        }
     }
 
     fun onCameraFramesDetected(
@@ -240,6 +342,7 @@ class PrismScanViewModel(
                 duplicateCooldownSeconds = currentSettings.duplicateCooldownSeconds
             )
             if (saved != null) {
+                _latestScannedRecord.value = saved
                 val isRisky = saved.securityRisk != SecurityRiskLevel.SAFE
                 feedbackController.triggerScanSuccess(
                     hapticEnabled = currentSettings.hapticFeedbackEnabled,
@@ -252,17 +355,15 @@ class PrismScanViewModel(
                 }
 
                 if (isBatchMode) {
+                    enrichBatchProductInBackground(saved)
                     emitMessage("Batch +1: ${saved.primaryTitle}")
                 } else if (isContinuousScanActive.value) {
+                    enrichBatchProductInBackground(saved)
                     emitMessage("Captured [${saved.format.shortTag}]: ${saved.primaryTitle}")
                 } else {
-                    _inspectedRecord.value = saved
-                    if (currentSettings.autoOpenSafeUrls &&
-                        saved.payloadType == ParsedPayloadType.URL &&
-                        saved.securityRisk == SecurityRiskLevel.SAFE
-                    ) {
-                        ActionIntentHelper.openUrlSafely(appContext, saved.rawValue)
-                    }
+                    // Never automatically launch external links without user interaction.
+                    // Always open the ScanResultBottomSheet with context-aware actions.
+                    inspectRecord(saved)
                 }
             }
         }
@@ -310,9 +411,17 @@ class PrismScanViewModel(
                         batchSessionId = if (isBatchMode) _activeBatchSessionId.value else null,
                         duplicatePreventionEnabled = false
                     )
-                    if (firstSaved == null && saved != null) {
-                        firstSaved = saved
+                    if (saved != null) {
+                        if (isBatchMode) {
+                            enrichBatchProductInBackground(saved)
+                        }
+                        if (firstSaved == null) {
+                            firstSaved = saved
+                        }
                     }
+                }
+                if (firstSaved != null) {
+                    _latestScannedRecord.value = firstSaved
                 }
                 feedbackController.triggerScanSuccess(
                     hapticEnabled = currentSettings.hapticFeedbackEnabled,
@@ -320,7 +429,7 @@ class PrismScanViewModel(
                     isWarning = firstSaved?.securityRisk != SecurityRiskLevel.SAFE
                 )
                 if (!isBatchMode && firstSaved != null) {
-                    _inspectedRecord.value = firstSaved
+                    inspectRecord(firstSaved)
                 }
                 emitMessage("Decoded ${decoded.size} barcode(s) from image")
             }
@@ -356,6 +465,7 @@ class PrismScanViewModel(
                 duplicatePreventionEnabled = false
             )
             if (saved != null) {
+                _latestScannedRecord.value = saved
                 val currentSettings = settings.value
                 feedbackController.triggerScanSuccess(
                     hapticEnabled = currentSettings.hapticFeedbackEnabled,
@@ -363,9 +473,10 @@ class PrismScanViewModel(
                     isWarning = saved.securityRisk != SecurityRiskLevel.SAFE
                 )
                 if (isBatchMode) {
+                    enrichBatchProductInBackground(saved)
                     emitMessage("Batch +1 [${saved.format.shortTag}]: ${saved.primaryTitle}")
                 } else {
-                    _inspectedRecord.value = saved
+                    inspectRecord(saved)
                 }
             }
         }
@@ -431,7 +542,10 @@ class PrismScanViewModel(
         viewModelScope.launch {
             scanRepository.deleteRecord(record.id)
             if (_inspectedRecord.value?.id == record.id) {
-                _inspectedRecord.value = null
+                inspectRecord(null)
+            }
+            if (_latestScannedRecord.value?.id == record.id) {
+                _latestScannedRecord.value = null
             }
             emitMessage("Removed '${record.primaryTitle}' from Vault")
         }
@@ -447,7 +561,9 @@ class PrismScanViewModel(
     fun purgeAllHistory() {
         viewModelScope.launch {
             scanRepository.clearAllHistory()
-            _inspectedRecord.value = null
+            productLookupRepository.clearCache()
+            inspectRecord(null)
+            _latestScannedRecord.value = null
             emitMessage("Optical Vault completely purged")
         }
     }
@@ -527,6 +643,11 @@ class PrismScanViewModel(
         viewModelScope.launch { settingsRepository.setAutoOpenSafeUrls(enabled) }
     }
 
+    fun setAutomaticProductLookup(enabled: Boolean) {
+        _settings.value = _settings.value.copy(automaticProductLookup = enabled)
+        viewModelScope.launch { settingsRepository.setAutomaticProductLookup(enabled) }
+    }
+
     fun setLowLightAutoBoost(enabled: Boolean) {
         _settings.value = _settings.value.copy(lowLightAutoBoost = enabled)
         viewModelScope.launch { settingsRepository.setLowLightAutoBoost(enabled) }
@@ -546,15 +667,21 @@ class PrismScanViewModel(
         private val appContext: Context,
         private val scanRepository: ScanRepository,
         private val settingsRepository: SettingsRepository,
-        private val feedbackController: FeedbackController
+        private val feedbackController: FeedbackController,
+        private val productLookupRepository: ProductLookupRepository? = null
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            val lookupRepo = productLookupRepository ?: ProductLookupRepository(
+                productCacheDao = PrismScanDatabase.getInstance(appContext).productCacheDao(),
+                connectivityChecker = AndroidNetworkConnectivityChecker(appContext)
+            )
             return PrismScanViewModel(
                 appContext = appContext,
                 scanRepository = scanRepository,
                 settingsRepository = settingsRepository,
-                feedbackController = feedbackController
+                feedbackController = feedbackController,
+                productLookupRepository = lookupRepo
             ) as T
         }
     }

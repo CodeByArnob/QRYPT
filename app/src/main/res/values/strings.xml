@@ -32,7 +32,9 @@
     <!-- Result Actions -->
     <string name="action_copy">Copy</string>
     <string name="action_share">Share</string>
-    <string name="action_open_url">Open Safely</string>
+    <string name="action_open_url">Open Link</string>
+    <string name="action_view_product">View Product</string>
+    <string name="action_search_online">Search Online</string>
     <string name="action_favorite">Favorite</string>
     <string name="action_delete">Delete</string>
     <string name="action_export_csv">Export CSV</string>
@@ -41,7 +43,7 @@
     <string name="security_warning_desc">This URL exhibits potential phishing, unencrypted HTTP, IP-literal host, or homograph characteristics. Verify before opening.</string>
 
     <!-- History & Settings -->
-    <string name="history_search_hint">Search payload, format, label, or notes…</string>
+    <string name="history_search_hint">Search payload, format, label, or notes...</string>
     <string name="history_empty_title">Your QRYPT Vault is Empty</string>
     <string name="history_empty_subtitle">Scanned and generated codes appear here with full offline search, security inspection, and bulk CSV/JSON export.</string>
     <string name="settings_clear_history">Clear All Scan History</string>

@@ -11,10 +11,65 @@ import android.provider.ContactsContract
 import android.provider.Settings
 import androidx.core.content.FileProvider
 import com.example.domain.model.ParsedPayload
+import com.example.domain.parser.PayloadParser
 import java.io.File
 import java.io.FileOutputStream
+import java.net.URI
+import java.net.URLEncoder
+import java.util.Locale
+
+sealed interface UrlValidationResult {
+    data class Valid(val normalizedUrl: String, val host: String, val scheme: String) : UrlValidationResult
+    data class Rejected(val reason: String) : UrlValidationResult
+}
 
 object ActionIntentHelper {
+
+    fun validateExternalHttpUrl(rawUrl: String): UrlValidationResult {
+        val trimmed = rawUrl.trim()
+        if (trimmed.isEmpty()) {
+            return UrlValidationResult.Rejected("URL cannot be empty.")
+        }
+        if (trimmed.contains(" ") || trimmed.contains("\n") || trimmed.contains("\r")) {
+            return UrlValidationResult.Rejected("Malformed URL containing whitespace.")
+        }
+        if (PayloadParser.hasUnsafeUriScheme(trimmed)) {
+            val badScheme = trimmed.substringBefore(":").lowercase(Locale.US)
+            return UrlValidationResult.Rejected("Unsafe URI scheme '$badScheme:' is blocked. Only http and https links are allowed.")
+        }
+
+        val lower = trimmed.lowercase(Locale.US)
+        val normalized = when {
+            lower.startsWith("http://") || lower.startsWith("https://") -> trimmed
+            PayloadParser.isSafeWebUrl(trimmed) -> "https://$trimmed"
+            else -> {
+                if (lower.contains(":")) {
+                    val scheme = lower.substringBefore(":")
+                    return UrlValidationResult.Rejected("Unsupported URI scheme '$scheme:'. Only http and https links are allowed.")
+                }
+                return UrlValidationResult.Rejected("Invalid web URL syntax.")
+            }
+        }
+
+        return try {
+            val uri = URI(normalized)
+            val scheme = uri.scheme?.lowercase(Locale.US).orEmpty()
+            val host = uri.host?.trim().orEmpty()
+            if (scheme != "http" && scheme != "https") {
+                UrlValidationResult.Rejected("Only http and https links are allowed.")
+            } else if (host.isEmpty()) {
+                UrlValidationResult.Rejected("URL is missing a valid destination host.")
+            } else {
+                UrlValidationResult.Valid(
+                    normalizedUrl = normalized,
+                    host = host,
+                    scheme = scheme
+                )
+            }
+        } catch (_: Exception) {
+            UrlValidationResult.Rejected("Malformed URL syntax.")
+        }
+    }
 
     fun copyToClipboard(context: Context, label: String, text: String): Boolean {
         return try {
@@ -26,8 +81,8 @@ object ActionIntentHelper {
         }
     }
 
-    fun shareText(context: Context, text: String, title: String = "Share Barcode Payload") {
-        try {
+    fun shareText(context: Context, text: String, title: String = "Share Barcode Payload"): Boolean {
+        return try {
             val sendIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, text)
@@ -37,7 +92,9 @@ object ActionIntentHelper {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(chooser)
+            true
         } catch (_: Exception) {
+            false
         }
     }
 
@@ -94,50 +151,69 @@ object ActionIntentHelper {
         }
     }
 
-    fun openUrlSafely(context: Context, rawUrl: String) {
-        try {
-            val normalized = if (rawUrl.startsWith("http://", true) || rawUrl.startsWith("https://", true)) {
-                rawUrl.trim()
-            } else {
-                "https://${rawUrl.trim()}"
-            }
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(normalized)).apply {
+    fun openUrlSafely(context: Context, rawUrl: String): Boolean {
+        val validation = validateExternalHttpUrl(rawUrl)
+        if (validation !is UrlValidationResult.Valid) {
+            return false
+        }
+        return try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(validation.normalizedUrl)).apply {
+                addCategory(Intent.CATEGORY_BROWSABLE)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
+            true
         } catch (_: Exception) {
+            false
         }
     }
 
-    fun dialPhone(context: Context, phone: String) {
-        try {
+    fun buildSearchOnlineUrl(query: String): String {
+        val encoded = URLEncoder.encode(query.trim(), "UTF-8")
+        return "https://www.google.com/search?q=$encoded"
+    }
+
+    fun searchOnline(context: Context, query: String): Boolean {
+        val trimmed = query.trim()
+        if (trimmed.isEmpty()) return false
+        val searchUrl = buildSearchOnlineUrl(trimmed)
+        return openUrlSafely(context, searchUrl)
+    }
+
+    fun dialPhone(context: Context, phone: String): Boolean {
+        return try {
             val clean = phone.removePrefix("tel:").removePrefix("TEL:").trim()
+            if (clean.isEmpty()) return false
             val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$clean")).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
+            true
         } catch (_: Exception) {
+            false
         }
     }
 
-    fun sendSms(context: Context, parsed: ParsedPayload) {
-        try {
+    fun sendSms(context: Context, parsed: ParsedPayload): Boolean {
+        return try {
             val map = parsed.structuredFields.toMap()
-            val phone = map["Phone Number"].orEmpty()
+            val phone = map["Phone Number"].orEmpty().ifEmpty { parsed.primaryTitle }
             val body = map["Message Body"].orEmpty()
             val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:$phone")).apply {
                 putExtra("sms_body", body)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
+            true
         } catch (_: Exception) {
+            false
         }
     }
 
-    fun sendEmail(context: Context, parsed: ParsedPayload) {
-        try {
+    fun sendEmail(context: Context, parsed: ParsedPayload): Boolean {
+        return try {
             val map = parsed.structuredFields.toMap()
-            val recipient = map["Recipient"].orEmpty()
+            val recipient = map["Recipient"].orEmpty().ifEmpty { parsed.primaryTitle }
             val subject = map["Subject"].orEmpty()
             val body = map["Message"] ?: map["Body"].orEmpty()
             val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$recipient")).apply {
@@ -146,23 +222,27 @@ object ActionIntentHelper {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
+            true
         } catch (_: Exception) {
+            false
         }
     }
 
-    fun openGeoLocation(context: Context, rawGeo: String) {
-        try {
+    fun openGeoLocation(context: Context, rawGeo: String): Boolean {
+        return try {
             val uri = if (rawGeo.startsWith("geo:", true)) Uri.parse(rawGeo) else Uri.parse("geo:0,0?q=$rawGeo")
             val intent = Intent(Intent.ACTION_VIEW, uri).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
+            true
         } catch (_: Exception) {
+            false
         }
     }
 
-    fun insertContact(context: Context, parsed: ParsedPayload) {
-        try {
+    fun insertContact(context: Context, parsed: ParsedPayload): Boolean {
+        return try {
             val map = parsed.structuredFields.toMap()
             val intent = Intent(ContactsContract.Intents.Insert.ACTION).apply {
                 type = ContactsContract.RawContacts.CONTENT_TYPE
@@ -175,7 +255,9 @@ object ActionIntentHelper {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
+            true
         } catch (_: Exception) {
+            false
         }
     }
 
@@ -200,8 +282,8 @@ object ActionIntentHelper {
         }
     }
 
-    fun insertCalendarEvent(context: Context, parsed: ParsedPayload) {
-        try {
+    fun insertCalendarEvent(context: Context, parsed: ParsedPayload): Boolean {
+        return try {
             val map = parsed.structuredFields.toMap()
             val intent = Intent(Intent.ACTION_INSERT).apply {
                 data = CalendarContract.Events.CONTENT_URI
@@ -211,7 +293,9 @@ object ActionIntentHelper {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
+            true
         } catch (_: Exception) {
+            false
         }
     }
 }

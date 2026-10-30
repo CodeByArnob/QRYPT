@@ -81,6 +81,7 @@ fun SettingsScreen(
     onContinuousModeChange: (Boolean) -> Unit,
     onClearNonFavorites: () -> Unit,
     onPurgeAllHistory: () -> Unit,
+    onAutoProductLookupChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val glass = LocalLiquidGlass.current
@@ -146,7 +147,7 @@ fun SettingsScreen(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Developer: Arnobrazz • Version 1.0.0",
+                    text = "Developer: Arnobrazz | Version 1.1.0",
                     style = MaterialTheme.typography.bodySmall,
                     color = glass.textSecondary
                 )
@@ -334,10 +335,20 @@ fun SettingsScreen(
                 HorizontalDivider(color = glass.glassSpecularBorderBottom)
 
                 SettingToggleRow(
-                    title = "Auto-Open Verified Safe URLs",
-                    subtitle = "Automatically launch HTTPS links that pass all anti-phishing checks",
-                    checked = settings.autoOpenSafeUrls,
-                    onCheckedChange = onAutoOpenSafeUrlsChange,
+                    title = "Automatic Product Barcode Lookup",
+                    subtitle = "Automatically query Open Food Facts over HTTPS when a retail GTIN barcode is scanned",
+                    checked = settings.automaticProductLookup,
+                    onCheckedChange = onAutoProductLookupChange,
+                    testTag = "settings_product_lookup_switch"
+                )
+
+                HorizontalDivider(color = glass.glassSpecularBorderBottom)
+
+                SettingToggleRow(
+                    title = "Require Confirmation Before Opening Links",
+                    subtitle = "Always display security verification before launching external browser intents",
+                    checked = !settings.autoOpenSafeUrls,
+                    onCheckedChange = { onAutoOpenSafeUrlsChange(!it) },
                     testTag = "settings_auto_open_switch"
                 )
 
@@ -432,7 +443,7 @@ fun SettingsScreen(
                 }
 
                 Text(
-                    text = "100% Offline Guarantee: QRYPT requires zero accounts, zero cloud sync, and zero internet permissions. All $totalStoredRecords records reside strictly on-device.",
+                    text = "Local Vault Guarantee: QRYPT requires zero accounts and zero cloud sync. All $totalStoredRecords scan records and cached product details reside strictly on-device. When enabled, product barcode lookup sends only the numeric GTIN over HTTPS to Open Food Facts.",
                     style = MaterialTheme.typography.bodySmall,
                     color = glass.textSecondary
                 )

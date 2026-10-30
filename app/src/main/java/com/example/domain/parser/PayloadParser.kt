@@ -19,7 +19,43 @@ object PayloadParser {
         ".zip", ".mov", ".top", ".xyz", ".tk", ".ml", ".ga", ".cf", ".gq", ".icu"
     )
 
+    private val UNSAFE_URI_SCHEMES = setOf(
+        "javascript", "data", "file", "vbscript", "intent", "content", "about", "blob", "jar"
+    )
+
     private val IPV4_REGEX = Regex("""^\d{1,3}(\.\d{1,3}){3}$""")
+    private val PLAIN_EMAIL_REGEX = Regex("""^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$""")
+    private val INTL_PHONE_REGEX = Regex("""^\+\d[\d\s().-]{6,18}\d$""")
+    private val FORMATTED_PHONE_REGEX = Regex("""^\(\d{3}\)\s?\d{3}[-\s]\d{4}$""")
+
+    fun isSafeWebUrl(rawUrl: String): Boolean {
+        val trimmed = rawUrl.trim()
+        if (trimmed.isEmpty() || trimmed.contains(" ") || trimmed.contains("\n")) return false
+        val lower = trimmed.lowercase(Locale.US)
+        val explicitScheme = lower.substringBefore(":", "")
+        if (explicitScheme in UNSAFE_URI_SCHEMES) return false
+
+        val normalized = when {
+            lower.startsWith("http://") || lower.startsWith("https://") -> trimmed
+            isLikelyBareUrl(trimmed) -> "https://$trimmed"
+            else -> return false
+        }
+        return try {
+            val uri = URI(normalized)
+            val scheme = uri.scheme?.lowercase(Locale.US)
+            val host = uri.host?.trim().orEmpty()
+            (scheme == "http" || scheme == "https") && host.isNotEmpty() && host.contains(".")
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    fun hasUnsafeUriScheme(raw: String): Boolean {
+        val trimmed = raw.trim().lowercase(Locale.US)
+        if (!trimmed.contains(":")) return false
+        val scheme = trimmed.substringBefore(":").trim()
+        return scheme in UNSAFE_URI_SCHEMES
+    }
 
     fun parse(rawValue: String, format: BarcodeFormatType = BarcodeFormatType.QR_CODE): ParsedPayload {
         val trimmed = rawValue.trim()
@@ -49,9 +85,19 @@ object PayloadParser {
             return parseCalendar(trimmed)
         }
 
-        // 4. Email (mailto: or MATMSG:)
-        if (upper.startsWith("MAILTO:") || upper.startsWith("MATMSG:")) {
-            return parseEmail(trimmed)
+        // 4. Email (mailto:, MATMSG:, or plain email address)
+        if (upper.startsWith("MAILTO:") || upper.startsWith("MATMSG:") || PLAIN_EMAIL_REGEX.matches(trimmed)) {
+            return if (PLAIN_EMAIL_REGEX.matches(trimmed)) {
+                ParsedPayload(
+                    type = ParsedPayloadType.EMAIL,
+                    rawValue = trimmed,
+                    primaryTitle = trimmed,
+                    subtitle = "Email Address",
+                    structuredFields = listOf("Recipient" to trimmed)
+                )
+            } else {
+                parseEmail(trimmed)
+            }
         }
 
         // 5. SMS (smsto: or sms:)
@@ -59,9 +105,11 @@ object PayloadParser {
             return parseSms(trimmed)
         }
 
-        // 6. Phone (tel:)
-        if (upper.startsWith("TEL:")) {
-            val number = trimmed.substringAfter(":", "").trim()
+        // 6. Phone (tel: or formatted phone number)
+        if (upper.startsWith("TEL:") ||
+            (format == BarcodeFormatType.QR_CODE && (INTL_PHONE_REGEX.matches(trimmed) || FORMATTED_PHONE_REGEX.matches(trimmed)))
+        ) {
+            val number = if (upper.startsWith("TEL:")) trimmed.substringAfter(":", "").trim() else trimmed
             return ParsedPayload(
                 type = ParsedPayloadType.PHONE,
                 rawValue = trimmed,
@@ -76,7 +124,33 @@ object PayloadParser {
             return parseGeo(trimmed)
         }
 
-        // 8. Website URL
+        // 8. Check for unsafe URI schemes (javascript:, data:, file:, intent:, etc.)
+        if (hasUnsafeUriScheme(trimmed)) {
+            val scheme = trimmed.substringBefore(":").lowercase(Locale.US)
+            val blockedReport = UrlSecurityReport(
+                riskLevel = SecurityRiskLevel.SUSPICIOUS,
+                host = "Blocked ($scheme scheme)",
+                scheme = scheme,
+                warnings = listOf(
+                    "Unsafe URI scheme '$scheme:' is blocked for security",
+                    "Only verified http and https web links can be opened externally"
+                )
+            )
+            return ParsedPayload(
+                type = ParsedPayloadType.PLAIN_TEXT,
+                rawValue = trimmed,
+                primaryTitle = "Blocked URI ($scheme)",
+                subtitle = "Unsafe Scheme Blocked",
+                structuredFields = listOf(
+                    "Detected Scheme" to scheme,
+                    "Security Policy" to "Blocked (Only HTTP and HTTPS links are permitted)",
+                    "Raw Content" to trimmed
+                ),
+                urlSecurityReport = blockedReport
+            )
+        }
+
+        // 9. Website URL (HTTP / HTTPS / bare www domain)
         if (upper.startsWith("HTTP://") || upper.startsWith("HTTPS://") || isLikelyBareUrl(trimmed)) {
             val normalizedUrl = if (upper.startsWith("HTTP://") || upper.startsWith("HTTPS://")) {
                 trimmed
@@ -88,28 +162,28 @@ object PayloadParser {
                 type = ParsedPayloadType.URL,
                 rawValue = trimmed,
                 primaryTitle = security.host.ifEmpty { trimmed },
-                subtitle = "${security.scheme.uppercase(Locale.US)} • ${security.riskLevel.label}",
+                subtitle = "${security.scheme.uppercase(Locale.US)} | ${security.riskLevel.label}",
                 structuredFields = buildList {
                     add("URL" to normalizedUrl)
                     add("Host" to security.host)
                     add("Protocol" to security.scheme.uppercase(Locale.US))
                     add("Security Status" to security.riskLevel.label)
                     if (security.warnings.isNotEmpty()) {
-                        add("Risk Details" to security.warnings.joinToString(" • "))
+                        add("Risk Details" to security.warnings.joinToString("; "))
                     }
                 },
                 urlSecurityReport = security
             )
         }
 
-        // 9. ISBN / Retail Product (EAN-13, EAN-8, UPC-A, UPC-E, or 12/13-digit numeric)
+        // 10. ISBN / Retail Product (EAN-13, EAN-8, UPC-A, UPC-E, or 8/12/13/14-digit numeric)
         val digitsOnly = trimmed.all { it.isDigit() }
         if (digitsOnly && (format in listOf(
                 BarcodeFormatType.EAN_13,
                 BarcodeFormatType.EAN_8,
                 BarcodeFormatType.UPC_A,
                 BarcodeFormatType.UPC_E
-            ) || trimmed.length in listOf(8, 12, 13))
+            ) || trimmed.length in listOf(8, 12, 13, 14))
         ) {
             if (trimmed.length == 13 && (trimmed.startsWith("978") || trimmed.startsWith("979"))) {
                 val isbnValid = isValidGtin(trimmed)
@@ -118,7 +192,7 @@ object PayloadParser {
                     type = ParsedPayloadType.ISBN,
                     rawValue = trimmed,
                     primaryTitle = "ISBN ${formatIsbn(trimmed)}",
-                    subtitle = "Bookland Publication • ${if (isbnValid) "Valid Checksum" else "Unverified Checksum"}",
+                    subtitle = "Bookland Publication | ${if (isbnValid) "Valid Checksum" else "Unverified Checksum"}",
                     structuredFields = buildList {
                         add("ISBN-13" to formatIsbn(trimmed))
                         if (isbn10 != null) add("ISBN-10" to isbn10)
@@ -135,7 +209,7 @@ object PayloadParser {
                 type = ParsedPayloadType.PRODUCT,
                 rawValue = trimmed,
                 primaryTitle = "GTIN $trimmed",
-                subtitle = "${format.displayName} • $origin",
+                subtitle = "${format.displayName} | $origin",
                 structuredFields = listOf(
                     "Product Identifier" to trimmed,
                     "Symbology" to format.displayName,
@@ -146,12 +220,12 @@ object PayloadParser {
             )
         }
 
-        // 10. Plain Text fallback
+        // 11. Plain Text fallback
         return ParsedPayload(
             type = ParsedPayloadType.PLAIN_TEXT,
             rawValue = trimmed,
             primaryTitle = trimmed.lineSequence().firstOrNull()?.take(48) ?: trimmed.take(48),
-            subtitle = "${format.displayName} • ${trimmed.length} chars",
+            subtitle = "${format.displayName} | ${trimmed.length} chars",
             structuredFields = listOf(
                 "Format" to format.displayName,
                 "Character Count" to "${trimmed.length} characters",
@@ -163,11 +237,25 @@ object PayloadParser {
     fun analyzeUrlSecurity(urlString: String, rawInputWasHttp: Boolean = false): UrlSecurityReport {
         val warnings = mutableListOf<String>()
         return try {
-            val uri = URI(urlString.trim())
+            val trimmed = urlString.trim()
+            if (hasUnsafeUriScheme(trimmed)) {
+                val badScheme = trimmed.substringBefore(":").lowercase(Locale.US)
+                return UrlSecurityReport(
+                    riskLevel = SecurityRiskLevel.SUSPICIOUS,
+                    host = trimmed.take(40),
+                    scheme = badScheme,
+                    warnings = listOf("Unsafe URI scheme '$badScheme:' is not permitted")
+                )
+            }
+
+            val uri = URI(trimmed)
             val scheme = (uri.scheme ?: if (rawInputWasHttp) "http" else "https").lowercase(Locale.US)
-            val host = (uri.host ?: urlString.substringAfter("://").substringBefore("/").substringBefore("?")).lowercase(Locale.US)
+            val host = (uri.host ?: trimmed.substringAfter("://").substringBefore("/").substringBefore("?")).lowercase(Locale.US)
             val rawAuthority = uri.rawAuthority ?: ""
 
+            if (scheme != "http" && scheme != "https") {
+                warnings.add("Unsupported URI scheme '$scheme' (only HTTP and HTTPS are allowed)")
+            }
             if (scheme == "http" || rawInputWasHttp) {
                 warnings.add("Unencrypted HTTP connection (traffic can be intercepted)")
             }
@@ -191,7 +279,8 @@ object PayloadParser {
             }
 
             val riskLevel = when {
-                rawAuthority.contains("@") ||
+                (scheme != "http" && scheme != "https") ||
+                    rawAuthority.contains("@") ||
                     IPV4_REGEX.matches(host) ||
                     host.contains("xn--") ||
                     HIGH_RISK_TLDS.any { host.endsWith(it) } ||
@@ -203,7 +292,7 @@ object PayloadParser {
 
             UrlSecurityReport(
                 riskLevel = riskLevel,
-                host = host.ifEmpty { urlString },
+                host = host.ifEmpty { trimmed },
                 scheme = scheme,
                 warnings = warnings
             )
@@ -236,7 +325,7 @@ object PayloadParser {
             type = ParsedPayloadType.WIFI,
             rawValue = raw,
             primaryTitle = ssid,
-            subtitle = "Wi-Fi • ${if (auth == "NOPASS") "Open" else auth}",
+            subtitle = "Wi-Fi | ${if (auth == "NOPASS") "Open" else auth}",
             structuredFields = fields
         )
     }
@@ -257,7 +346,7 @@ object PayloadParser {
                 rawValue = raw,
                 primaryTitle = name,
                 subtitle = listOfNotNull(org.takeIf { it.isNotEmpty() }, tel.takeIf { it.isNotEmpty() })
-                    .joinToString(" • ").ifEmpty { "Business Card (MECARD)" },
+                    .joinToString(" | ").ifEmpty { "Business Card (MECARD)" },
                 structuredFields = buildList {
                     add("Full Name" to name)
                     if (org.isNotEmpty()) add("Organization" to org)
@@ -304,7 +393,7 @@ object PayloadParser {
             rawValue = raw,
             primaryTitle = display,
             subtitle = listOfNotNull(title.takeIf { it.isNotEmpty() }, org.takeIf { it.isNotEmpty() }, phone.takeIf { it.isNotEmpty() })
-                .joinToString(" • ").ifEmpty { "vCard Contact" },
+                .joinToString(" | ").ifEmpty { "vCard Contact" },
             structuredFields = buildList {
                 if (fullName.isNotEmpty()) add("Name" to fullName)
                 if (title.isNotEmpty()) add("Role / Title" to title)
@@ -433,11 +522,16 @@ object PayloadParser {
         )
     }
 
+    private val BARE_URL_WITH_PATH_REGEX = Regex("""^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}(/.*)$""", RegexOption.IGNORE_CASE)
+
     private fun isLikelyBareUrl(text: String): Boolean {
-        if (text.contains(" ") || text.contains("\n")) return false
+        if (text.contains(" ") || text.contains("\n") || text.contains("@")) return false
         val lower = text.lowercase(Locale.US)
-        return lower.startsWith("www.") && lower.count { it == '.' } >= 2
+        return (lower.startsWith("www.") && lower.count { it == '.' } >= 2) ||
+            BARE_URL_WITH_PATH_REGEX.matches(trimmedOrSelf(text))
     }
+
+    private fun trimmedOrSelf(text: String): String = text.trim()
 
     private fun parseSemicolonTokens(input: String): Map<String, String> {
         val result = mutableMapOf<String, String>()

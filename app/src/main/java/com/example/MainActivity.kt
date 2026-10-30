@@ -172,6 +172,8 @@ fun PrismScanAppRoot(
     val ambientLuminance by viewModel.ambientLuminance.collectAsStateWithLifecycle()
     val liveDetections by viewModel.liveDetections.collectAsStateWithLifecycle()
     val inspectedRecord by viewModel.inspectedRecord.collectAsStateWithLifecycle()
+    val latestScannedRecord by viewModel.latestScannedRecord.collectAsStateWithLifecycle()
+    val productLookupState by viewModel.productLookupState.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
     var currentDestination by rememberSaveable { mutableStateOf(PrismDestination.SCANNER) }
@@ -346,6 +348,10 @@ fun PrismScanAppRoot(
                                         },
                                         onTriggerSampleScan = { sample ->
                                             viewModel.triggerOpticalSampleScan(sample, isBatchMode = false)
+                                        },
+                                        latestScannedRecord = latestScannedRecord,
+                                        onInspectLatestRecord = {
+                                            latestScannedRecord?.let { viewModel.inspectRecord(it) }
                                         }
                                     )
                                 }
@@ -410,7 +416,8 @@ fun PrismScanAppRoot(
                                         onDefaultScanRegionChange = viewModel::setDefaultScanRegion,
                                         onContinuousModeChange = viewModel::setContinuousScanMode,
                                         onClearNonFavorites = viewModel::clearNonFavoriteHistory,
-                                        onPurgeAllHistory = viewModel::purgeAllHistory
+                                        onPurgeAllHistory = viewModel::purgeAllHistory,
+                                        onAutoProductLookupChange = viewModel::setAutomaticProductLookup
                                     )
                                 }
                             }
@@ -421,6 +428,8 @@ fun PrismScanAppRoot(
                 inspectedRecord?.let { record ->
                     ScanResultBottomSheet(
                         record = record,
+                        productLookupState = productLookupState,
+                        onRetryProductLookup = viewModel::lookupProductForRecord,
                         onDismiss = { viewModel.inspectRecord(null) },
                         onToggleFavorite = viewModel::toggleFavorite,
                         onUpdateNotes = viewModel::updateRecordNotes,

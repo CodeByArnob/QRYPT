@@ -284,14 +284,14 @@ class BarcodeScannerEngine(
             SampleTestBarcode(
                 id = "wifi_hq",
                 title = "Studio Fiber 6E Wi-Fi",
-                subtitle = "QR Code • WPA3 Enterprise Network",
+                subtitle = "QR Code | WPA3 Enterprise Network",
                 format = BarcodeFormatType.QR_CODE,
                 payload = "WIFI:T:WPA;S:AetherGlass-5G-Ultra;P:Prism#2026!Optic;H:false;;"
             ),
             SampleTestBarcode(
                 id = "vcard_exec",
                 title = "Executive Business Card",
-                subtitle = "QR Code • vCard 3.0 Contact",
+                subtitle = "QR Code | vCard 3.0 Contact",
                 format = BarcodeFormatType.QR_CODE,
                 payload = PayloadParser.buildVCardPayload(
                     fullName = "Elena Vance",
@@ -305,29 +305,29 @@ class BarcodeScannerEngine(
             ),
             SampleTestBarcode(
                 id = "ean13_coffee",
-                title = "Artisan Espresso Beans",
-                subtitle = "EAN-13 • Retail Product (Italy GS1)",
+                title = "Retail Product Barcode",
+                subtitle = "EAN-13 | Open Food Facts Product Lookup",
                 format = BarcodeFormatType.EAN_13,
-                payload = "8001234567893"
+                payload = "3017620422003"
             ),
             SampleTestBarcode(
                 id = "isbn_book",
                 title = "Clean Architecture Handbook",
-                subtitle = "EAN-13 / ISBN-13 • Bookland Publication",
+                subtitle = "EAN-13 / ISBN-13 | Bookland Publication",
                 format = BarcodeFormatType.EAN_13,
                 payload = "9780134494166"
             ),
             SampleTestBarcode(
                 id = "code128_shipment",
                 title = "Air Freight Tracking",
-                subtitle = "Code 128 • Supply Chain Container",
+                subtitle = "Code 128 | Supply Chain Container",
                 format = BarcodeFormatType.CODE_128,
                 payload = "AWB-94820-SFO-TYO"
             ),
             SampleTestBarcode(
                 id = "suspicious_url",
                 title = "Suspicious Phishing Test Link",
-                subtitle = "QR Code • Punycode & Unencrypted HTTP",
+                subtitle = "QR Code | Punycode & Unencrypted HTTP",
                 format = BarcodeFormatType.QR_CODE,
                 payload = "http://secure-login@xn--pple-43d.top/verify-session"
             )

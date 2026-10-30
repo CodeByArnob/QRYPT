@@ -21,13 +21,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Label
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -52,12 +56,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.data.local.ScanRecordEntity
 import com.example.data.repository.ScanRepository
+import com.example.domain.model.ParsedPayloadType
 import com.example.engine.BarcodeScannerEngine
 import com.example.engine.SampleTestBarcode
 import com.example.ui.components.FormatBadge
 import com.example.ui.components.LiquidGlassCard
 import com.example.ui.components.LiquidGlassPill
-import com.example.ui.theme.DangerCrimson
 import com.example.ui.theme.JetBrainsMonoFontFamily
 import com.example.ui.theme.LocalLiquidGlass
 import com.example.util.ActionIntentHelper
@@ -135,7 +139,7 @@ fun BatchScannerScreen(
                     value = bulkTagText,
                     onValueChange = { bulkTagText = it },
                     label = { Text("Batch Note") },
-                    placeholder = { Text("e.g., Audit Q4 - Aisle 3") },
+                    placeholder = { Text("e.g., Audit Q4, Aisle 3") },
                     modifier = Modifier.fillMaxWidth()
                 )
             },
@@ -322,7 +326,7 @@ fun BatchScannerScreen(
                             style = MaterialTheme.typography.titleLarge
                         )
                         Text(
-                            text = "Capture multiple retail barcodes, shipping labels, or QR codes in rapid succession, then bulk-annotate and export as RFC-4180 CSV or JSON.",
+                            text = "Capture multiple retail barcodes, shipping labels, or QR codes in rapid succession, then inspect product details, open links safely, or bulk export as CSV or JSON.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = glass.textSecondary
                         )
@@ -345,47 +349,106 @@ fun BatchScannerScreen(
                             .fillMaxWidth()
                             .testTag("batch_item_${item.id}")
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    FormatBadge(format = item.format)
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        FormatBadge(format = item.format)
+                                        Text(
+                                            text = item.primaryTitle,
+                                            style = MaterialTheme.typography.titleMedium,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-                                        text = item.primaryTitle,
-                                        style = MaterialTheme.typography.titleMedium,
+                                        text = item.rawValue,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontFamily = JetBrainsMonoFontFamily,
+                                        color = glass.textSecondary,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
+                                    if (item.customNotes.isNotBlank()) {
+                                        Text(
+                                            text = "Tag: ${item.customNotes}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = glass.primaryAccent
+                                        )
+                                    }
                                 }
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = item.rawValue,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontFamily = JetBrainsMonoFontFamily,
-                                    color = glass.textSecondary,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                if (item.customNotes.isNotBlank()) {
-                                    Text(
-                                        text = "Tag: ${item.customNotes}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = glass.primaryAccent
+                                IconButton(onClick = { onDeleteRecord(item) }) {
+                                    Icon(
+                                        imageVector = Icons.Default.DeleteSweep,
+                                        contentDescription = "Remove Item",
+                                        tint = glass.textSecondary
                                     )
                                 }
                             }
-                            IconButton(onClick = { onDeleteRecord(item) }) {
-                                Icon(
-                                    imageVector = Icons.Default.DeleteSweep,
-                                    contentDescription = "Remove Item",
-                                    tint = glass.textSecondary
-                                )
+
+                            // Inline Batch Item Smart Action Row
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                val primaryActionLabel = when (item.payloadType) {
+                                    ParsedPayloadType.URL -> "Open Link"
+                                    ParsedPayloadType.PRODUCT, ParsedPayloadType.ISBN -> "View Product"
+                                    ParsedPayloadType.PHONE -> "Call"
+                                    ParsedPayloadType.EMAIL -> "Send Email"
+                                    ParsedPayloadType.SMS -> "Send Message"
+                                    ParsedPayloadType.GEO -> "View Location"
+                                    ParsedPayloadType.CONTACT_VCARD -> "Add Contact"
+                                    else -> "Open Result"
+                                }
+                                val primaryActionIcon = when (item.payloadType) {
+                                    ParsedPayloadType.PRODUCT, ParsedPayloadType.ISBN -> Icons.Default.ShoppingBag
+                                    else -> Icons.AutoMirrored.Filled.OpenInNew
+                                }
+
+                                OutlinedButton(
+                                    onClick = { onInspectRecord(item) },
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .testTag("batch_item_action_${item.id}")
+                                ) {
+                                    Icon(primaryActionIcon, contentDescription = null, modifier = Modifier.size(15.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(primaryActionLabel, style = MaterialTheme.typography.labelMedium, maxLines = 1)
+                                }
+
+                                OutlinedButton(
+                                    onClick = {
+                                        ActionIntentHelper.copyToClipboard(context, item.primaryTitle, item.rawValue)
+                                        onShowMessage("Copied to clipboard")
+                                    },
+                                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                                    modifier = Modifier.testTag("batch_item_copy_${item.id}")
+                                ) {
+                                    Icon(Icons.Default.ContentCopy, contentDescription = "Copy", modifier = Modifier.size(15.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Copy", style = MaterialTheme.typography.labelMedium)
+                                }
+
+                                OutlinedButton(
+                                    onClick = { ActionIntentHelper.shareText(context, item.rawValue) },
+                                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                                    modifier = Modifier.testTag("batch_item_share_${item.id}")
+                                ) {
+                                    Icon(Icons.Default.Share, contentDescription = "Share", modifier = Modifier.size(15.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Share", style = MaterialTheme.typography.labelMedium)
+                                }
                             }
                         }
                     }

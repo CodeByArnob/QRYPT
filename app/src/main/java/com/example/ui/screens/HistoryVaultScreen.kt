@@ -170,7 +170,7 @@ fun HistoryVaultScreen(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = onSearchQueryChange,
-                    placeholder = { Text("Search payload, GTIN, SSID, format, or note…") },
+                    placeholder = { Text("Search payload, GTIN, SSID, format, or note...") },
                     leadingIcon = {
                         Icon(Icons.Default.Search, contentDescription = null, tint = glass.primaryAccent)
                     },
@@ -319,7 +319,7 @@ private fun VaultRecordCard(
                     ) {
                         FormatBadge(format = record.format)
                         Text(
-                            text = "$sourceLabel • $timeFormatted",
+                            text = "$sourceLabel | $timeFormatted",
                             style = MaterialTheme.typography.labelSmall,
                             color = glass.textSecondary,
                             maxLines = 1,

@@ -61,6 +61,10 @@ class ScanRepository(private val dao: ScanRecordDao) {
         dao.updateCustomNotes(id, notes)
     }
 
+    suspend fun updateTitleAndSubtitle(id: Long, title: String, subtitle: String) {
+        dao.updateTitleAndSubtitle(id, title, subtitle)
+    }
+
     suspend fun deleteRecord(id: Long) {
         dao.deleteById(id)
     }
@@ -105,7 +109,7 @@ class ScanRepository(private val dao: ScanRecordDao) {
                 appendLine("{")
                 appendLine("  \"application\": \"QRYPT\",")
                 appendLine("  \"developer\": \"Arnobrazz\",")
-                appendLine("  \"version\": \"1.0.0\",")
+                appendLine("  \"version\": \"1.1.0\",")
                 appendLine("  \"exported_count\": ${records.size},")
                 appendLine("  \"records\": [")
                 records.forEachIndexed { index, r ->

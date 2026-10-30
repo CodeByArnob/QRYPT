@@ -30,6 +30,9 @@ interface ScanRecordDao {
     @Query("UPDATE scan_records SET customNotes = :notes WHERE id = :id")
     suspend fun updateCustomNotes(id: Long, notes: String)
 
+    @Query("UPDATE scan_records SET primaryTitle = :title, subtitle = :subtitle WHERE id = :id")
+    suspend fun updateTitleAndSubtitle(id: Long, title: String, subtitle: String)
+
     @Query("DELETE FROM scan_records WHERE id = :id")
     suspend fun deleteById(id: Long)
 

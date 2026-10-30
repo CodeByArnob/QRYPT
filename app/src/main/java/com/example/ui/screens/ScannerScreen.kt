@@ -94,7 +94,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.example.data.local.ScanRecordEntity
 import com.example.domain.model.DetectedBarcodeFrame
+import com.example.domain.model.ParsedPayloadType
 import com.example.domain.model.ScanRegionMode
 import com.example.engine.BarcodeScannerEngine
 import com.example.engine.SampleTestBarcode
@@ -123,6 +125,8 @@ fun ScannerScreen(
     onLuminanceUpdated: (Float) -> Unit,
     onGalleryImageSelected: (android.net.Uri) -> Unit,
     onTriggerSampleScan: (SampleTestBarcode) -> Unit,
+    latestScannedRecord: ScanRecordEntity? = null,
+    onInspectLatestRecord: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -374,6 +378,58 @@ fun ScannerScreen(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            latestScannedRecord?.let { latest ->
+                LiquidGlassCard(
+                    onClick = onInspectLatestRecord,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("scanner_latest_result_banner"),
+                    shape = RoundedCornerShape(20.dp),
+                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f).padding(end = 10.dp)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                FormatBadge(format = latest.format)
+                                Text(
+                                    text = latest.payloadType.displayName,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = glass.primaryAccent
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = latest.primaryTitle,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1
+                            )
+                        }
+                        Button(
+                            onClick = onInspectLatestRecord,
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                            modifier = Modifier.testTag("scanner_open_latest_result_button")
+                        ) {
+                            Text(
+                                text = when (latest.payloadType) {
+                                    ParsedPayloadType.URL -> "Open Link"
+                                    ParsedPayloadType.PRODUCT, ParsedPayloadType.ISBN -> "View Product"
+                                    else -> "Open Result"
+                                },
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
+                    }
+                }
+            }
+
             if (hasCameraPermission) {
                 LiquidGlassCard(
                     modifier = Modifier.fillMaxWidth(),
